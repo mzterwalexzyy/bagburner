@@ -5,6 +5,7 @@ import Link from "next/link";
 import { Topbar } from "@/components/Topbar";
 import { StatCard } from "@/components/StatCard";
 import { getStats, getFeed, reportPdfUrl, type Stats, type ActivityEntry } from "@/lib/api";
+import { ShieldCheck, Bot, FileText, Wallet, Package, Search, FileCheck2 } from "lucide-react";
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -18,6 +19,19 @@ function timeAgo(iso: string): string {
 function shortAddr(addr: string): string {
   return addr && addr.length > 10 ? `${addr.slice(0, 6)}...${addr.slice(-4)}` : addr;
 }
+
+const FEATURE_BULLETS = [
+  { Icon: ShieldCheck, title: "Real On-Chain Payments", desc: "Pay securely with BOT on BOT Chain Testnet." },
+  { Icon: Bot, title: "Autonomous Agents", desc: "AI agents negotiate, pay, and get results — 24/7." },
+  { Icon: FileText, title: "Professional Reports", desc: "PDF reports with clear insights and next steps." },
+];
+
+const HOW_IT_WORKS = [
+  { Icon: Wallet, title: "Request", desc: "An agent (or you) picks a wallet and requests analysis." },
+  { Icon: Package, title: "Pay On-Chain", desc: "Payment is sent to the ReportPayments contract on BOT Chain." },
+  { Icon: Search, title: "Analyze", desc: "The host verifies payment and runs the real tax analysis." },
+  { Icon: FileCheck2, title: "Deliver", desc: "A PDF report + summary is delivered back." },
+];
 
 export default function HomePage() {
   const [stats, setStats] = useState<Stats | null>(null);
@@ -65,13 +79,27 @@ export default function HomePage() {
               BagBurner agents negotiate, pay, and deliver real tax analysis reports — autonomously, on BOT Chain, with
               every step verifiable on-chain.
             </p>
-            <div className="flex gap-3">
+            <div className="flex gap-3 mb-6">
               <Link href="/request" className="px-5 py-2.5 rounded-md bg-accent text-black font-medium text-sm hover:opacity-90 transition">
                 Request a Report →
               </Link>
               <Link href="/docs" className="px-5 py-2.5 rounded-md border border-border text-sm hover:bg-surface-2 transition">
                 How it Works
               </Link>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 border-t border-border">
+              {FEATURE_BULLETS.map(({ Icon, title, desc }) => (
+                <div key={title} className="flex items-start gap-2.5 pt-4">
+                  <div className="w-8 h-8 rounded-md bg-accent-dim border border-accent/30 flex items-center justify-center text-accent shrink-0">
+                    <Icon size={16} />
+                  </div>
+                  <div>
+                    <div className="text-xs font-medium">{title}</div>
+                    <div className="text-xs text-muted">{desc}</div>
+                  </div>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -111,15 +139,10 @@ export default function HomePage() {
           <h2 className="font-semibold mb-1">How it works</h2>
           <p className="text-sm text-muted mb-6">Simple, autonomous, and verifiable.</p>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {[
-              ["Request", "An agent (or you) picks a wallet and requests analysis."],
-              ["Pay On-Chain", "Payment is sent to the ReportPayments contract on BOT Chain."],
-              ["Analyze", "The host verifies payment and runs the real tax analysis."],
-              ["Deliver", "A PDF report + summary is delivered back."],
-            ].map(([title, desc], i) => (
+            {HOW_IT_WORKS.map(({ Icon, title, desc }) => (
               <div key={title}>
-                <div className="w-10 h-10 rounded-full bg-accent-dim border border-accent/40 text-accent flex items-center justify-center mx-auto mb-3 text-sm font-semibold">
-                  {i + 1}
+                <div className="w-10 h-10 rounded-full bg-accent-dim border border-accent/40 text-accent flex items-center justify-center mx-auto mb-3">
+                  <Icon size={18} />
                 </div>
                 <div className="font-medium text-sm mb-1">{title}</div>
                 <div className="text-xs text-muted">{desc}</div>
