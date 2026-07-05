@@ -1,8 +1,7 @@
 import { verifyPaymentForWallet, markRedeemed } from "../chain/contractListener.js";
 import { getReportFee, botChain } from "../chain/viemClient.js";
-import { buildTaxReport } from "../engine/reportBuilder.js";
+import { fulfillReport, recordFailedAttempt } from "../engine/fulfillment.js";
 import { composeMessage, HOST_ROLE_PROMPT } from "../llm/chat.js";
-import { generateReportPdf } from "../report/pdf.js";
 import { sendHostMessage, sendHostDocument } from "./telegram.js";
 
 const ADDRESS_RE = /0x[a-fA-F0-9]{40}\b/;
@@ -42,9 +41,15 @@ export async function handleHumanMessage(chatId: string, text: string): Promise<
       );
       await sendHostMessage(chatId, startMsg);
 
-      const report = await buildTaxReport(wallet, payment.requestId);
+      const { report, pdf } = await fulfillReport({
+        requestId: payment.requestId,
+        payer: payment.guest,
+        walletAnalyzed: wallet,
+        feeWei: payment.fee.toString(),
+        txHash,
+        source: "human-telegram",
+      });
       markRedeemed(txHash);
-      const pdf = await generateReportPdf(report);
       const deliverMsg = await composeMessage(
         HOST_ROLE_PROMPT,
         `The report for ${wallet} is done: realized P&L $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}, ${report.harvestOpportunities.length} harvest candidate(s). Announce it's ready and attach the PDF.`,
@@ -53,6 +58,7 @@ export async function handleHumanMessage(chatId: string, text: string): Promise<
       await sendHostDocument(chatId, pdf, `bagburner-report-${payment.requestId}.pdf`, deliverMsg);
     } catch (err) {
       const reason = err instanceof Error ? err.message : String(err);
+      recordFailedAttempt({ payer: "unknown", walletAnalyzed: session.pendingWallet ?? "unknown", feeWei: "0", txHash, source: "human-telegram" }, reason);
       const refuseMsg = await composeMessage(
         HOST_ROLE_PROMPT,
         `A user claimed to have paid with tx ${txHash} for wallet ${session.pendingWallet}, but verification failed: "${reason}". Politely but firmly refuse and explain you can't find a matching payment on-chain, and ask them to check and resend the correct tx hash.`,

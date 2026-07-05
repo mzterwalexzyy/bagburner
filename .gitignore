@@ -1,10 +1,16 @@
 node_modules/
 dist/
 .env
-*.env
+.env.*
 !.env.example
+!.env.local.example
+*.env
 data/logs/
 
 contracts/out/
 contracts/cache/
 contracts/lib/
+
+host/reports/
+host/data/activity.jsonl
+web/.next/

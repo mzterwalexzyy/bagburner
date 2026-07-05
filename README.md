@@ -21,6 +21,10 @@ The flow in each chat is real, not scripted text: at every step (requesting a re
 
 **You can also talk to the host directly.** The host bot polls for private DMs alongside its automated guest conversations, so you can message it yourself — ask what it does, send it a wallet address, and it'll quote its fee and ask you to pay `payForReport(wallet)` on the contract and send back the tx hash. If you claim to have paid without a matching on-chain payment, it genuinely checks and refuses — it isn't scripted to say yes.
 
+### The web dashboard
+
+A third, browser-based way to use BagBurner (`web/`) — a Next.js dashboard where you can **connect a real wallet, pay `payForReport` yourself on-chain, and get a live PDF back**, no Telegram required. It also shows genuinely live data pulled from the host: reports generated, active guest count, total on-chain volume, success rate, a live activity feed, and every completed report with a working PDF download link. All three surfaces (guest agents, human Telegram chat, and the website) funnel through the same real verification-and-analysis pipeline on the host.
+
 ## On-chain proof
 
 - **Contract:** `ReportPayments.sol` deployed on BOT Chain testnet at [`0x302f3C42537D9A215de29018C82d9287ccE55c42`](https://scan.bohr.life/address/0x302f3C42537D9A215de29018C82d9287ccE55c42)
@@ -38,6 +42,7 @@ host/        Node/TS Express service — "BagBurner Host"
   report/      Designed PDF generation (branded header, stat cards, color-coded tables)
   telegram/    Host bot: per-pair message/PDF delivery + a poller for direct human DMs
 guest/       Node/TS client — autonomous ask→pay→handoff loop, own bot + role prompt per guest
+web/         Next.js dashboard — wallet-connect-and-pay, live stats/feed, report downloads
 data/        Pre-fetched pool of real, verified-active wallet addresses
 scripts/     One-time script that builds the wallet pool from on-chain data
 ```
@@ -70,6 +75,7 @@ Rather than calling a live wallet-discovery API during the demo (a point of fail
 - LLM-composed natural-language dialogue for every step, with a plain-English fallback if the LLM call fails or is rate-limited, so the flow always completes even if the wording degrades
 - A designed PDF report (branded header, color-coded P&L cards, real tables with verdict colors) delivered as a Telegram file attachment
 - Direct human↔host chat alongside the automated flow, sharing the same real verification/analysis pipeline
+- A web dashboard with real wallet-connect-and-pay (browser MetaMask → `payForReport` on-chain → live PDF), plus live stats/feed/report-history pulled from the host, not mocked
 
 **Roadmap (not built — deliberately out of scope for this MVP):**
 - Solana support (architecture is chain-agnostic; only the Ethereum data adapter is implemented)
@@ -108,6 +114,13 @@ GUEST_ID=1 GUEST_PRIVATE_KEY=0x... GUEST_BOT_TOKEN=... TELEGRAM_CHAT_ID=... npm 
 ```
 
 Telegram setup: create one bot per agent via @BotFather, one private group per guest↔host pair containing that guest's bot + the host bot + you, and set `HOST_BOT_TOKEN` (host) / `GUEST_BOT_TOKEN` + `TELEGRAM_CHAT_ID` (each guest) accordingly.
+
+```bash
+# 5. Start the web dashboard
+cd web && npm install
+cp .env.local.example .env.local   # fill in the contract address + host URL
+npm run dev
+```
 
 ## Demo
 
