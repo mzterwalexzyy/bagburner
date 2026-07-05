@@ -1,5 +1,5 @@
 import "dotenv/config";
-import { appendFileSync } from "fs";
+import { appendFileSync, existsSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 import { getPartition, WalletCycler } from "./partition.js";
@@ -14,11 +14,13 @@ const GUEST_COUNT = Number(process.env.GUEST_COUNT ?? "1");
 const HOST_URL = process.env.HOST_URL ?? "http://localhost:4000";
 const LOOP_INTERVAL_MS = Number(process.env.LOOP_INTERVAL_MS ?? "60000");
 
-const logPath = resolve(__dir, `../../data/logs/guest-${GUEST_ID}.jsonl`);
+const logsDir = resolve(__dir, "../../data/logs");
+const logPath = resolve(logsDir, `guest-${GUEST_ID}.jsonl`);
 
 function log(entry: Record<string, unknown>) {
   const line = JSON.stringify({ ts: new Date().toISOString(), ...entry });
   console.log(`[guest-${GUEST_ID}] ${line}`);
+  if (!existsSync(logsDir)) mkdirSync(logsDir, { recursive: true });
   appendFileSync(logPath, line + "\n");
 }
 

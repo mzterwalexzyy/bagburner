@@ -1,9 +1,10 @@
-import { readFileSync, existsSync, writeFileSync } from "fs";
+import { readFileSync, existsSync, writeFileSync, mkdirSync } from "fs";
 import { resolve, dirname } from "path";
 import { fileURLToPath } from "url";
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const POOL_PATH = resolve(__dir, "../../data/wallet-pool.json");
+const LOGS_DIR = resolve(__dir, "../../data/logs");
 
 function loadPool(): string[] {
   return JSON.parse(readFileSync(POOL_PATH, "utf8"));
@@ -38,6 +39,7 @@ export class WalletCycler {
   next(): string {
     const wallet = this.wallets[this.cursor % this.wallets.length];
     this.cursor += 1;
+    if (!existsSync(LOGS_DIR)) mkdirSync(LOGS_DIR, { recursive: true });
     writeFileSync(this.statePath, JSON.stringify({ cursor: this.cursor }));
     return wallet;
   }
