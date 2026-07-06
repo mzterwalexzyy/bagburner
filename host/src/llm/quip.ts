@@ -10,6 +10,11 @@ const BIG_GAIN_QUIPS = [
   "You out-traded the market and in-funded the government. Balanced, in a way.",
   "Somewhere a tax collector just felt a disturbance in the force.",
   "Nice gains. Shame about the silent business partner who shows up every April.",
+  "You beat the market. The market's cousin at the tax office would like a word.",
+  "Bag secured. Now comes the part where you share it with a silent partner.",
+  "Whale numbers, minnow excuses when April comes knocking.",
+  "The chart went up, and so did your government's mood.",
+  "Diamond hands, paper trail — the taxman reads both.",
 ];
 
 const LOSS_QUIPS = [
@@ -19,6 +24,10 @@ const LOSS_QUIPS = [
   "At least the taxman can't repossess what never made it home.",
   "Red numbers, but hey — at least there's nothing for the government to touch.",
   "Loss harvesting: the only silver lining that actually shows up on a spreadsheet.",
+  "Nothing taxes a loss like the loss itself already did.",
+  "Rough chart, but on the bright side, this is the one report the IRS won't enjoy.",
+  "You paid tuition to the market. No refunds, no receipts, no taxes either.",
+  "The dip took your bag. It left your tax bill light, at least.",
 ];
 
 const NEUTRAL_QUIPS = [
@@ -27,16 +36,27 @@ const NEUTRAL_QUIPS = [
   "Modest moves, modest bill. The boring trade is still a trade.",
   "No fireworks this round, but the math still checks out.",
   "Steady as she goes — no legends made, no lessons learned the hard way.",
+  "A quiet report for a quiet wallet. Even the taxman is unimpressed.",
+  "Not every wallet needs a plot twist. This one's just fine as-is.",
+  "Middle of the road, numbers-wise. Comes with the territory.",
 ];
 
-function pick(list: string[]): string {
-  return list[Math.floor(Math.random() * list.length)];
+// Last fallback line served per bucket — never repeated back-to-back, even under
+// heavy LLM rate-limiting where the fallback pool is effectively the only source.
+const lastQuipByBucket = new Map<string, string>();
+
+function pick(bucket: string, list: string[]): string {
+  const last = lastQuipByBucket.get(bucket);
+  const pool = list.length > 1 && last ? list.filter((q) => q !== last) : list;
+  const choice = pool[Math.floor(Math.random() * pool.length)];
+  lastQuipByBucket.set(bucket, choice);
+  return choice;
 }
 
 function fallbackQuip(realizedPnlUsd: number, taxOwedUsd?: number): string {
-  if (taxOwedUsd && taxOwedUsd > 0) return pick(BIG_GAIN_QUIPS);
-  if (realizedPnlUsd < 0) return pick(LOSS_QUIPS);
-  return pick(NEUTRAL_QUIPS);
+  if (taxOwedUsd && taxOwedUsd > 0) return pick("gain", BIG_GAIN_QUIPS);
+  if (realizedPnlUsd < 0) return pick("loss", LOSS_QUIPS);
+  return pick("neutral", NEUTRAL_QUIPS);
 }
 
 export async function generateQuip(input: {
