@@ -11,10 +11,16 @@ export function assessPositions(positions: RawPosition[], currentPrices: Map<str
     const currentPriceUsd = currentPrices.get(p.tokenAddress.toLowerCase()) ?? null;
 
     if (currentPriceUsd === null) {
+      // No listing means no reliable market to value this against — it also means the
+      // "cost basis" for tokens that arrived via spam/airdrop (the overwhelming majority
+      // of unlisted tokens in practice) is itself unreliable. Asserting the full assumed
+      // cost as a definite dollar loss would manufacture a confident number out of noise,
+      // the same failure mode as the realized-P&L fix. Flag it as worth cutting, but don't
+      // claim a loss we can't actually stand behind.
       return {
         ...p,
         currentPriceUsd: null,
-        unrealizedUsd: -p.quantity * p.avgCostUsd,
+        unrealizedUsd: 0,
         verdict: "cut" as Verdict,
       };
     }
