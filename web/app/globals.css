@@ -67,3 +67,18 @@ body {
   background: var(--background);
   color: var(--foreground);
 }
+
+/* Mobile drawer sidebar — plain CSS to avoid ambiguity with Tailwind's CSS-variable-based
+   translate utilities. Closed off-screen by default; open slides it in. Desktop (>=768px,
+   matching Tailwind's `md:` breakpoint) always shows it in place. */
+.sidebar-mobile {
+  transform: translateX(-100%);
+}
+.sidebar-mobile.sidebar-open {
+  transform: translateX(0);
+}
+@media (min-width: 768px) {
+  .sidebar-mobile {
+    transform: none;
+  }
+}
