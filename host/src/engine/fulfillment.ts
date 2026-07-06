@@ -16,11 +16,12 @@ export interface FulfillParams {
   feeWei: string;
   txHash: string;
   source: Source;
+  taxRatePercent?: number;
 }
 
 /** Shared "actually do the work" step used by every entry point (guest HTTP, Telegram human chat, web) — builds the report, saves the PDF to disk once, and logs the activity. */
 export async function fulfillReport(params: FulfillParams): Promise<{ report: TaxReport; pdf: Buffer; pdfPath: string }> {
-  const report = await buildTaxReport(params.walletAnalyzed, params.requestId);
+  const report = await buildTaxReport(params.walletAnalyzed, params.requestId, params.taxRatePercent);
   const pdf = await generateReportPdf(report);
 
   if (!existsSync(REPORTS_DIR)) mkdirSync(REPORTS_DIR, { recursive: true });
@@ -37,6 +38,8 @@ export async function fulfillReport(params: FulfillParams): Promise<{ report: Ta
     realizedPnlUsd: report.realizedPnlUsd,
     unrealizedPnlUsd: report.unrealizedPnlUsd,
     harvestCount: report.harvestOpportunities.length,
+    taxRatePercent: report.taxRatePercent,
+    potentialTaxOwedUsd: report.potentialTaxOwedUsd,
     source: params.source,
     createdAt: new Date().toISOString(),
   });

@@ -29,6 +29,9 @@ export interface TaxReport {
   harvestOpportunities: OpenPosition[];
   positions: OpenPosition[];
   llmSummary: string;
+  taxRatePercent?: number; // optional — when provided, potentialTaxOwedUsd is computed
+  potentialTaxOwedUsd?: number;
+  quip: string; // always-present closing one-liner
   computedAt: string;
 }
 
@@ -38,4 +41,5 @@ export interface ReportRequestBody {
   txHash: string;
   chain: "ETH";
   telegramChatId?: string;
+  taxRatePercent?: number;
 }

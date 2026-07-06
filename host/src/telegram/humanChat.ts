@@ -55,7 +55,7 @@ export async function handleHumanMessage(chatId: string, text: string): Promise<
         `The report for ${wallet} is done: realized P&L $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}, ${report.harvestOpportunities.length} harvest candidate(s). Announce it's ready and attach the PDF.`,
         `✅ BagBurner Host: report ready for ${wallet}. Realized P&L $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}, ${report.harvestOpportunities.length} harvest candidate(s). PDF attached.`
       );
-      await sendHostDocument(chatId, pdf, `bagburner-report-${payment.requestId}.pdf`, deliverMsg);
+      await sendHostDocument(chatId, pdf, `bagburner-report-${payment.requestId}.pdf`, `${deliverMsg}\n\n${report.quip}`);
     } catch (err) {
       const reason = err instanceof Error ? err.message : String(err);
       recordFailedAttempt({ payer: "unknown", walletAnalyzed: session.pendingWallet ?? "unknown", feeWei: "0", txHash, source: "human-telegram" }, reason);

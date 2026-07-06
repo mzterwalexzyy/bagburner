@@ -15,6 +15,7 @@ const RECEIVE_ITEMS = [
   "Realized & unrealized P&L",
   "Harvest opportunities",
   "Position-level recommendations",
+  "Optional tax-owed estimate",
   "Plain-English summary",
 ];
 
@@ -29,6 +30,7 @@ export default function RequestReportPage() {
   const { isConnected } = useAccount();
   const [wallet, setWallet] = useState("");
   const [label, setLabel] = useState("");
+  const [taxRate, setTaxRate] = useState("");
   const [stage, setStage] = useState<Stage>("idle");
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<RequestReportResult | null>(null);
@@ -68,7 +70,8 @@ export default function RequestReportPage() {
   useEffect(() => {
     if (!isConfirmed || !txHash) return;
     setStage("analyzing");
-    submitPaidRequest(wallet, txHash)
+    const parsedTaxRate = taxRate.trim() ? Number(taxRate) : undefined;
+    submitPaidRequest(wallet, txHash, parsedTaxRate)
       .then((res) => {
         setResult(res);
         setStage("done");
@@ -137,6 +140,21 @@ export default function RequestReportPage() {
                 disabled={busy}
                 className="w-full bg-surface-2 border border-border rounded-md px-3 py-2 text-sm focus:outline-none focus:border-accent disabled:opacity-50"
               />
+              <label className="text-xs text-muted block mt-4 mb-1.5">Tax rate estimate (optional)</label>
+              <div className="relative">
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  value={taxRate}
+                  onChange={(e) => setTaxRate(e.target.value)}
+                  placeholder="e.g. 24"
+                  disabled={busy}
+                  className="w-full bg-surface-2 border border-border rounded-md px-3 py-2 pr-8 text-sm focus:outline-none focus:border-accent disabled:opacity-50"
+                />
+                <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted">%</span>
+              </div>
+              <p className="text-xs text-muted mt-1">If set, the report estimates tax owed on realized gains at this rate.</p>
             </div>
 
             <div className="rounded-2xl border border-border bg-surface p-5 md:p-6">
@@ -176,7 +194,14 @@ export default function RequestReportPage() {
                     <span className="text-muted">Unrealized P&L</span>
                     <span>${result.unrealizedPnlUsd.toFixed(2)}</span>
                   </div>
+                  {result.potentialTaxOwedUsd !== undefined && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted">Est. Tax Owed ({result.taxRatePercent}%)</span>
+                      <span>${result.potentialTaxOwedUsd.toFixed(2)}</span>
+                    </div>
+                  )}
                   <p className="text-xs text-muted pt-1">{result.llmSummary}</p>
+                  {result.quip && <p className="text-xs italic text-accent border-t border-accent/20 mt-1 pt-2">{result.quip}</p>}
                   <a href={result.pdfUrl} target="_blank" rel="noreferrer" className="inline-block text-sm text-accent hover:underline pt-1">
                     Download PDF report ↗
                   </a>

@@ -17,6 +17,8 @@ export interface ActivityEntry {
   realizedPnlUsd?: number;
   unrealizedPnlUsd?: number;
   harvestCount?: number;
+  taxRatePercent?: number;
+  potentialTaxOwedUsd?: number;
   source: "guest" | "human-telegram" | "web";
   createdAt: string;
 }
@@ -47,14 +49,17 @@ export interface RequestReportResult {
   unrealizedPnlUsd: number;
   harvestOpportunities: unknown[];
   llmSummary: string;
+  taxRatePercent?: number;
+  potentialTaxOwedUsd?: number;
+  quip: string;
   pdfUrl: string;
 }
 
-export async function submitPaidRequest(walletAnalyzed: string, txHash: string): Promise<RequestReportResult> {
+export async function submitPaidRequest(walletAnalyzed: string, txHash: string, taxRatePercent?: number): Promise<RequestReportResult> {
   const res = await fetch(`${HOST_URL}/request`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ walletAnalyzed, txHash }),
+    body: JSON.stringify({ walletAnalyzed, txHash, taxRatePercent }),
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error ?? "Request failed");

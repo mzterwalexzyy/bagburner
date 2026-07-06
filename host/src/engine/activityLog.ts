@@ -18,6 +18,8 @@ export interface ActivityEntry {
   realizedPnlUsd?: number;
   unrealizedPnlUsd?: number;
   harvestCount?: number;
+  taxRatePercent?: number;
+  potentialTaxOwedUsd?: number;
   source: Source;
   createdAt: string;
 }

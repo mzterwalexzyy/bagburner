@@ -31,7 +31,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       {open && <div className="fixed inset-0 z-40 bg-black/50 md:hidden" onClick={onClose} />}
 
       <aside
-        className={`sidebar-mobile w-64 shrink-0 border-r border-border bg-surface flex flex-col justify-between h-screen fixed top-0 left-0 z-50 transition-transform duration-200 md:sticky ${
+        className={`sidebar-mobile w-64 shrink-0 border-r border-border bg-surface flex flex-col justify-between h-screen fixed top-0 left-0 z-50 transition-transform duration-200 ${
           open ? "sidebar-open" : ""
         }`}
       >

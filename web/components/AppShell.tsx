@@ -6,9 +6,9 @@ import { MobileMenuProvider, useMobileMenu } from "@/lib/mobile-menu-context";
 function Shell({ children }: { children: React.ReactNode }) {
   const { open, closeMenu } = useMobileMenu();
   return (
-    <div className="flex">
+    <div>
       <Sidebar open={open} onClose={closeMenu} />
-      <div className="flex-1 min-w-0">{children}</div>
+      <div className="min-w-0 md:ml-64">{children}</div>
     </div>
   );
 }

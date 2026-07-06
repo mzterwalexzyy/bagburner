@@ -45,21 +45,24 @@ function drawHeader(doc: PDFKit.PDFDocument, report: TaxReport) {
 
 function drawStatCards(doc: PDFKit.PDFDocument, report: TaxReport) {
   const pageWidth = doc.page.width;
-  const cardWidth = (pageWidth - MARGIN * 2 - 16) / 2;
-  const cardHeight = 60;
-  const top = doc.y;
-
-  const cards: Array<[string, number]> = [
+  const hasTax = report.taxRatePercent !== undefined && report.potentialTaxOwedUsd !== undefined;
+  const cards: Array<[string, number, boolean?]> = [
     ["Realized P&L", report.realizedPnlUsd],
     ["Unrealized P&L", report.unrealizedPnlUsd],
   ];
+  if (hasTax) cards.push([`Est. Tax Owed (${report.taxRatePercent}%)`, report.potentialTaxOwedUsd as number, true]);
 
-  cards.forEach(([label, value], i) => {
-    const x = MARGIN + i * (cardWidth + 16);
-    const color = value < 0 ? COLORS.red : COLORS.green;
+  const gap = 16;
+  const cardWidth = (pageWidth - MARGIN * 2 - gap * (cards.length - 1)) / cards.length;
+  const cardHeight = 60;
+  const top = doc.y;
+
+  cards.forEach(([label, value, isTax], i) => {
+    const x = MARGIN + i * (cardWidth + gap);
+    const color = isTax ? COLORS.navy : value < 0 ? COLORS.red : COLORS.green;
     doc.roundedRect(x, top, cardWidth, cardHeight, 6).fillAndStroke(COLORS.lightGray, COLORS.border);
-    doc.fillColor(COLORS.slate).fontSize(9).font("Helvetica").text(label.toUpperCase(), x + 14, top + 12);
-    doc.fillColor(color).fontSize(20).font("Helvetica-Bold").text(usd(value), x + 14, top + 28);
+    doc.fillColor(COLORS.slate).fontSize(9).font("Helvetica").text((label as string).toUpperCase(), x + 14, top + 12, { width: cardWidth - 28 });
+    doc.fillColor(color).fontSize(18).font("Helvetica-Bold").text(usd(value as number), x + 14, top + 30);
   });
 
   doc.y = top + cardHeight + 24;
@@ -182,6 +185,14 @@ export function generateReportPdf(report: TaxReport): Promise<Buffer> {
     doc.moveDown(0.3);
     doc.font("Helvetica").fontSize(10).fillColor(COLORS.black).text(report.llmSummary, MARGIN, doc.y, { width: doc.page.width - MARGIN * 2 });
     doc.moveDown(1);
+
+    ensureSpace(doc, 50);
+    const quipWidth = doc.page.width - MARGIN * 2;
+    const quipTop = doc.y;
+    doc.roundedRect(MARGIN, quipTop, quipWidth, 40, 6).fill(COLORS.navy);
+    doc.fillColor(COLORS.white).font("Helvetica-Oblique").fontSize(10).text(report.quip, MARGIN + 14, quipTop + 12, { width: quipWidth - 28 });
+    doc.y = quipTop + 50;
+    doc.fillColor(COLORS.black);
 
     ensureSpace(doc, 30);
     doc.font("Helvetica").fontSize(8).fillColor(COLORS.slate).text(

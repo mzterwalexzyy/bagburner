@@ -28,6 +28,11 @@ function sleep(ms: number) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
+/** A random whole-number tax rate (5-40%) this guest assumes for the wallet, just to give the host something to estimate tax owed against. */
+function randomTaxRatePercent(): number {
+  return Math.floor(Math.random() * (40 - 5 + 1)) + 5;
+}
+
 async function runCycle(cycler: WalletCycler) {
   const wallet = cycler.next();
   const guest = guestAddress();
@@ -35,10 +40,11 @@ async function runCycle(cycler: WalletCycler) {
   const rolePrompt = guestRolePrompt(name);
   const chatId = process.env.TELEGRAM_CHAT_ID ?? "";
 
+  const taxRatePercent = randomTaxRatePercent();
   const askMsg = await composeMessage(
     rolePrompt,
-    `Announce that you need a fresh tax report for wallet ${wallet} and are about to check the host's current fee on-chain.`,
-    `🔎 ${name}: I need a tax report for wallet ${wallet}. Checking your fee on-chain now.`
+    `Announce that you need a fresh tax report for wallet ${wallet}, mention you're assuming a ${taxRatePercent}% tax rate for the estimate, and say you're about to check the host's current fee on-chain.`,
+    `🔎 ${name}: I need a tax report for wallet ${wallet} — let's assume a ${taxRatePercent}% tax rate. Checking your fee on-chain now.`
   );
   await sendGuestMessage(askMsg);
 
@@ -64,7 +70,7 @@ async function runCycle(cycler: WalletCycler) {
   const res = await fetch(`${HOST_URL}/report`, {
     method: "POST",
     headers: { "content-type": "application/json" },
-    body: JSON.stringify({ guest, walletAnalyzed: wallet, txHash, chain: "ETH", telegramChatId: chatId }),
+    body: JSON.stringify({ guest, walletAnalyzed: wallet, txHash, chain: "ETH", telegramChatId: chatId, taxRatePercent }),
   });
 
   const body = await res.json();
@@ -73,10 +79,13 @@ async function runCycle(cycler: WalletCycler) {
   log({
     wallet,
     txHash,
+    taxRatePercent,
     realizedPnlUsd: body.realizedPnlUsd,
     unrealizedPnlUsd: body.unrealizedPnlUsd,
+    potentialTaxOwedUsd: body.potentialTaxOwedUsd,
     harvestCount: body.harvestOpportunities?.length ?? 0,
     llmSummary: body.llmSummary,
+    quip: body.quip,
   });
 }
 

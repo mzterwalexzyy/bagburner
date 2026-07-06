@@ -130,6 +130,9 @@ export default function MyReportsPage() {
                           <>
                             <div>Realized P&L: ${r.realizedPnlUsd?.toFixed(2)}</div>
                             <div className="text-muted">Unrealized P&L: ${r.unrealizedPnlUsd?.toFixed(2)}</div>
+                            {r.potentialTaxOwedUsd !== undefined && (
+                              <div className="text-muted">Est. Tax ({r.taxRatePercent}%): ${r.potentialTaxOwedUsd.toFixed(2)}</div>
+                            )}
                           </>
                         ) : (
                           <span className="text-muted">—</span>

@@ -23,14 +23,14 @@ const PORT = Number(process.env.PORT ?? 4000);
 // Guest agent flow — payer identity (guest) must match the on-chain event.
 app.post("/report", async (req, res) => {
   const body = req.body as Partial<ReportRequestBody>;
-  const { guest, walletAnalyzed, txHash, chain, telegramChatId } = body;
+  const { guest, walletAnalyzed, txHash, chain, telegramChatId, taxRatePercent } = body;
   const chatId = telegramChatId ?? "";
 
   if (!guest || !walletAnalyzed || !txHash || chain !== "ETH") {
     return res.status(400).json({ error: "guest, walletAnalyzed, txHash, and chain='ETH' are required" });
   }
 
-  console.log(`[host] request from ${guest} for wallet ${walletAnalyzed} (tx ${txHash})`);
+  console.log(`[host] request from ${guest} for wallet ${walletAnalyzed} (tx ${txHash})${taxRatePercent ? ` at assumed tax rate ${taxRatePercent}%` : ""}`);
 
   try {
     const payment = await verifyPayment(txHash as `0x${string}`, guest, walletAnalyzed);
@@ -49,16 +49,20 @@ app.post("/report", async (req, res) => {
       feeWei: payment.fee.toString(),
       txHash,
       source: "guest",
+      taxRatePercent,
     });
     markRedeemed(txHash as `0x${string}`);
     console.log(`[host] report ready for requestId ${payment.requestId} — realized $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}`);
 
+    const taxNote = report.potentialTaxOwedUsd !== undefined
+      ? ` Assuming their ${report.taxRatePercent}% tax rate, estimated tax owed is $${report.potentialTaxOwedUsd.toFixed(2)}.`
+      : "";
     const deliverMsg = await composeMessage(
       HOST_ROLE_PROMPT,
-      `The report for ${walletAnalyzed} is done: realized P&L $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}, ${report.harvestOpportunities.length} harvest candidate(s). Announce it's ready and that you're attaching the PDF.`,
-      `✅ BagBurner Host: report ready for ${walletAnalyzed}. Realized P&L $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}, ${report.harvestOpportunities.length} harvest candidate(s). PDF attached.`
+      `The report for ${walletAnalyzed} is done: realized P&L $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}, ${report.harvestOpportunities.length} harvest candidate(s).${taxNote} Announce it's ready and that you're attaching the PDF.`,
+      `✅ BagBurner Host: report ready for ${walletAnalyzed}. Realized P&L $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}, ${report.harvestOpportunities.length} harvest candidate(s).${taxNote} PDF attached.`
     );
-    await sendHostDocument(chatId, pdf, `bagburner-report-${payment.requestId}.pdf`, deliverMsg);
+    await sendHostDocument(chatId, pdf, `bagburner-report-${payment.requestId}.pdf`, `${deliverMsg}\n\n${report.quip}`);
 
     res.json({ ...report, pdfUrl: `/reports/${payment.requestId}.pdf` });
   } catch (err) {
@@ -71,12 +75,16 @@ app.post("/report", async (req, res) => {
 
 // Web dashboard flow — a browser-connected wallet pays directly; no pre-registered guest identity.
 app.post("/request", async (req, res) => {
-  const { walletAnalyzed, txHash } = req.body as { walletAnalyzed?: string; txHash?: string };
+  const { walletAnalyzed, txHash, taxRatePercent } = req.body as {
+    walletAnalyzed?: string;
+    txHash?: string;
+    taxRatePercent?: number;
+  };
   if (!walletAnalyzed || !txHash) {
     return res.status(400).json({ error: "walletAnalyzed and txHash are required" });
   }
 
-  console.log(`[host] web request for wallet ${walletAnalyzed} (tx ${txHash})`);
+  console.log(`[host] web request for wallet ${walletAnalyzed} (tx ${txHash})${taxRatePercent ? ` at assumed tax rate ${taxRatePercent}%` : ""}`);
 
   try {
     const payment = await verifyPaymentForWallet(txHash as `0x${string}`, walletAnalyzed);
@@ -87,6 +95,7 @@ app.post("/request", async (req, res) => {
       feeWei: payment.fee.toString(),
       txHash,
       source: "web",
+      taxRatePercent,
     });
     markRedeemed(txHash as `0x${string}`);
     console.log(`[host] web report ready for requestId ${payment.requestId}`);
