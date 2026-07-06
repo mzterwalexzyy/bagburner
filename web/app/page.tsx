@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Topbar } from "@/components/Topbar";
 import { StatCard } from "@/components/StatCard";
 import { getStats, getFeed, reportPdfUrl, type Stats, type ActivityEntry } from "@/lib/api";
-import { ShieldCheck, Bot, FileText, Wallet, Package, Search, FileCheck2 } from "lucide-react";
+import { ShieldCheck, Bot, FileText, Wallet, Package, Search, FileCheck2, Users, Coins, CheckCircle2 } from "lucide-react";
 
 function timeAgo(iso: string): string {
   const diffMs = Date.now() - new Date(iso).getTime();
@@ -139,10 +139,10 @@ export default function HomePage() {
         </section>
 
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard label="Reports Generated" value={stats ? String(stats.reportsGenerated) : "—"} />
-          <StatCard label="Active Guest Agents" value={stats ? String(stats.activeAgents) : "—"} sublabel="24/7 automated" />
-          <StatCard label="Total Volume" value={stats ? `${stats.totalVolumeBot.toFixed(4)} BOT` : "—"} sublabel="On-chain payments" />
-          <StatCard label="Success Rate" value={stats ? `${stats.successRate}%` : "—"} sublabel="All time" />
+          <StatCard icon={FileText} label="Reports Generated" value={stats ? String(stats.reportsGenerated) : "—"} />
+          <StatCard icon={Users} label="Active Guest Agents" value={stats ? String(stats.activeAgents) : "—"} sublabel="24/7 automated" />
+          <StatCard icon={Coins} label="Total Volume" value={stats ? `${stats.totalVolumeBot.toFixed(4)} BOT` : "—"} sublabel="On-chain payments" />
+          <StatCard icon={CheckCircle2} label="Success Rate" value={stats ? `${stats.successRate}%` : "—"} sublabel="All time" />
         </section>
 
         <section className="rounded-2xl border border-border bg-surface p-8">
