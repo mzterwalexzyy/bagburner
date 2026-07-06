@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Search, Paperclip, Download } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
+import { FadeIn } from "@/components/FadeIn";
 import { getFeed, reportPdfUrl, type ActivityEntry } from "@/lib/api";
 
 function timeAgo(iso: string): string {
@@ -65,28 +66,29 @@ export default function ConversationsPage() {
             </div>
             <div className="overflow-y-auto divide-y divide-border lg:flex-1">
               {filtered.length === 0 && <p className="text-xs text-muted p-4">No conversations yet.</p>}
-              {filtered.map((e) => {
+              {filtered.map((e, i) => {
                 const key = keyOf(e);
                 const active = selected && keyOf(selected) === key;
                 return (
-                  <button
-                    key={key}
-                    onClick={() => setSelectedKey(key)}
-                    className={`w-full text-left p-3.5 flex items-start gap-2.5 transition ${active ? "bg-accent-dim" : "hover:bg-surface-2"}`}
-                  >
-                    <span
-                      className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${e.status === "completed" ? "bg-accent" : "bg-red"}`}
-                    />
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <span className="text-sm font-medium truncate">{speakerName(e)}</span>
-                        <span className="text-xs text-muted shrink-0">{timeAgo(e.createdAt)}</span>
+                  <FadeIn key={key} delay={Math.min(i, 8) * 40}>
+                    <button
+                      onClick={() => setSelectedKey(key)}
+                      className={`w-full text-left p-3.5 flex items-start gap-2.5 transition ${active ? "bg-accent-dim" : "hover:bg-surface-2"}`}
+                    >
+                      <span
+                        className={`w-2 h-2 rounded-full mt-1.5 shrink-0 ${e.status === "completed" ? "bg-accent animate-pulse" : "bg-red"}`}
+                      />
+                      <div className="min-w-0 flex-1">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <span className="text-sm font-medium truncate">{speakerName(e)}</span>
+                          <span className="text-xs text-muted shrink-0">{timeAgo(e.createdAt)}</span>
+                        </div>
+                        <p className="text-xs text-muted truncate">
+                          {e.status === "completed" ? `Report delivered for ${shortAddr(e.walletAnalyzed)}` : `Payment failed for ${shortAddr(e.walletAnalyzed)}`}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted truncate">
-                        {e.status === "completed" ? `Report delivered for ${shortAddr(e.walletAnalyzed)}` : `Payment failed for ${shortAddr(e.walletAnalyzed)}`}
-                      </p>
-                    </div>
-                  </button>
+                    </button>
+                  </FadeIn>
                 );
               })}
             </div>
@@ -104,20 +106,20 @@ export default function ConversationsPage() {
                   </div>
                   {selected.status === "completed" && (
                     <span className="text-xs text-accent flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block" /> Live
+                      <span className="w-1.5 h-1.5 rounded-full bg-accent inline-block animate-pulse" /> Live
                     </span>
                   )}
                 </div>
-                <div className="p-4 space-y-4 flex-1">
-                  <div className="flex gap-2.5">
+                <div key={selected.requestId} className="p-4 space-y-4 flex-1">
+                  <FadeIn className="flex gap-2.5">
                     <div className="w-7 h-7 rounded-full bg-blue-dim text-blue flex items-center justify-center text-xs shrink-0">G</div>
                     <div className="bg-surface-2 rounded-lg rounded-tl-none px-3 py-2 text-sm max-w-md">
                       Requesting a tax report for wallet {shortAddr(selected.walletAnalyzed)}, paying {Number(selected.feeWei) / 1e18} BOT on-chain.
                     </div>
-                  </div>
+                  </FadeIn>
 
                   {selected.status === "completed" ? (
-                    <div className="flex gap-2.5">
+                    <FadeIn delay={120} className="flex gap-2.5">
                       <div className="w-7 h-7 rounded-full bg-accent-dim text-accent flex items-center justify-center text-xs shrink-0">B</div>
                       <div className="space-y-2 max-w-md">
                         <div className="bg-accent-dim rounded-lg rounded-tl-none px-3 py-2 text-sm">
@@ -128,21 +130,21 @@ export default function ConversationsPage() {
                           href={reportPdfUrl(selected.requestId)}
                           target="_blank"
                           rel="noreferrer"
-                          className="flex items-center gap-2 bg-surface-2 border border-border rounded-lg px-3 py-2 text-xs hover:border-accent transition"
+                          className="flex items-center gap-2 bg-surface-2 border border-border rounded-lg px-3 py-2 text-xs hover:border-accent hover:scale-[1.02] transition-all"
                         >
                           <Paperclip size={14} className="text-red shrink-0" />
                           <span className="flex-1 truncate">Tax_Report_{shortAddr(selected.walletAnalyzed)}.pdf</span>
                           <Download size={14} className="text-accent shrink-0" />
                         </a>
                       </div>
-                    </div>
+                    </FadeIn>
                   ) : (
-                    <div className="flex gap-2.5">
+                    <FadeIn delay={120} className="flex gap-2.5">
                       <div className="w-7 h-7 rounded-full bg-red-dim text-red flex items-center justify-center text-xs shrink-0">B</div>
                       <div className="bg-red-dim rounded-lg rounded-tl-none px-3 py-2 text-sm max-w-md">
                         I don&apos;t see a matching payment on-chain for that request — verification failed.
                       </div>
-                    </div>
+                    </FadeIn>
                   )}
                 </div>
                 <div className="p-3 border-t border-border">

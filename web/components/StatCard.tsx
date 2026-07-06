@@ -7,12 +7,12 @@ export function StatCard({
   icon: Icon,
 }: {
   label: string;
-  value: string;
+  value: React.ReactNode;
   sublabel?: string;
   icon?: LucideIcon;
 }) {
   return (
-    <div className="rounded-xl border border-border bg-surface p-5">
+    <div className="rounded-xl border border-border bg-surface p-5 hover:shadow-lg hover:border-accent/40 hover:scale-[1.02] transition-all">
       <div className="flex items-center justify-between mb-1">
         <div className="text-sm text-muted">{label}</div>
         {Icon && (

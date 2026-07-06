@@ -5,6 +5,7 @@ import { useAccount } from "wagmi";
 import { Search, FileText, Download, ChevronLeft, ChevronRight } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import { FadeIn } from "@/components/FadeIn";
 import { getMyReports, reportPdfUrl, type ActivityEntry } from "@/lib/api";
 
 type Filter = "all" | "completed" | "processing" | "failed";
@@ -97,7 +98,7 @@ export default function MyReportsPage() {
           </div>
         </div>
 
-        <div className="rounded-2xl border border-border bg-surface overflow-hidden">
+        <FadeIn className="rounded-2xl border border-border bg-surface overflow-hidden block">
           {pageItems.length === 0 ? (
             <p className="text-sm text-muted p-6">
               {isConnected || showAll ? "No reports match." : "Connect a wallet to see your reports, or view all reports above."}
@@ -117,7 +118,7 @@ export default function MyReportsPage() {
                 </thead>
                 <tbody className="divide-y divide-border">
                   {pageItems.map((r) => (
-                    <tr key={r.requestId}>
+                    <tr key={r.requestId} className="hover:bg-surface-2 transition-colors">
                       <td className="p-4">
                         <div className="flex items-center gap-2">
                           <FileText size={16} className="text-red shrink-0" />
@@ -161,7 +162,7 @@ export default function MyReportsPage() {
               </table>
             </div>
           )}
-        </div>
+        </FadeIn>
 
         {pageCount > 1 && (
           <div className="flex items-center justify-center gap-2">

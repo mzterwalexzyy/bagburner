@@ -2,9 +2,11 @@
 
 import { useEffect, useState } from "react";
 import { useAccount, useReadContract, useWriteContract, useWaitForTransactionReceipt } from "wagmi";
-import { CheckCircle2, Wallet as WalletIcon, CreditCard } from "lucide-react";
+import { CheckCircle2, Wallet as WalletIcon, CreditCard, Loader2 } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
 import { ConnectWalletButton } from "@/components/ConnectWalletButton";
+import { FadeIn } from "@/components/FadeIn";
+import { TiltCard } from "@/components/TiltCard";
 import { CONTRACT_ADDRESS, REPORT_PAYMENTS_ABI } from "@/lib/contract";
 import { submitPaidRequest, getFeed, type RequestReportResult, type ActivityEntry } from "@/lib/api";
 
@@ -118,7 +120,8 @@ export default function RequestReportPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
           <div className="lg:col-span-2 space-y-5">
-            <div className="rounded-2xl border border-border bg-surface p-5 md:p-6">
+            <FadeIn>
+            <TiltCard className="rounded-2xl border border-border bg-surface p-5 md:p-6 block">
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-6 h-6 rounded-full bg-accent-dim text-accent text-xs font-semibold flex items-center justify-center shrink-0">1</span>
                 <h2 className="font-medium text-sm">Wallet to analyze</h2>
@@ -155,9 +158,11 @@ export default function RequestReportPage() {
                 <span className="absolute right-3 top-1/2 -translate-y-1/2 text-xs text-muted">%</span>
               </div>
               <p className="text-xs text-muted mt-1">If set, the report estimates tax owed on realized gains at this rate.</p>
-            </div>
+            </TiltCard>
+            </FadeIn>
 
-            <div className="rounded-2xl border border-border bg-surface p-5 md:p-6">
+            <FadeIn delay={80}>
+            <TiltCard className="rounded-2xl border border-border bg-surface p-5 md:p-6 block">
               <div className="flex items-center gap-2 mb-4">
                 <span className="w-6 h-6 rounded-full bg-accent-dim text-accent text-xs font-semibold flex items-center justify-center shrink-0">2</span>
                 <h2 className="font-medium text-sm">On-chain payment</h2>
@@ -185,7 +190,7 @@ export default function RequestReportPage() {
               {error && <p className="text-sm text-red mt-3">{error}</p>}
 
               {result && (
-                <div className="rounded-md border border-accent/40 bg-accent-dim p-4 space-y-2 mt-4">
+                <div className="rounded-md border border-accent/40 bg-accent-dim p-4 space-y-2 mt-4 fade-in-up">
                   <div className="flex justify-between text-sm">
                     <span className="text-muted">Realized P&L</span>
                     <span>${result.realizedPnlUsd.toFixed(2)}</span>
@@ -207,26 +212,32 @@ export default function RequestReportPage() {
                   </a>
                 </div>
               )}
-            </div>
+            </TiltCard>
+            </FadeIn>
           </div>
 
-          <div className="rounded-2xl border border-border bg-surface p-5 md:p-6 flex flex-col">
+          <FadeIn delay={160}>
+          <TiltCard className="rounded-2xl border border-border bg-surface p-5 md:p-6 flex flex-col h-full">
             <h2 className="font-medium text-sm mb-4">What you&apos;ll receive</h2>
             <ul className="space-y-2.5 flex-1">
-              {RECEIVE_ITEMS.map((item) => (
-                <li key={item} className="flex items-start gap-2 text-sm">
-                  <CheckCircle2 size={16} className="text-accent shrink-0 mt-0.5" />
-                  <span>{item}</span>
-                </li>
+              {RECEIVE_ITEMS.map((item, i) => (
+                <FadeIn key={item} delay={200 + i * 50}>
+                  <li className="flex items-start gap-2 text-sm">
+                    <CheckCircle2 size={16} className="text-accent shrink-0 mt-0.5" />
+                    <span>{item}</span>
+                  </li>
+                </FadeIn>
               ))}
             </ul>
             <div className="mt-6 rounded-xl bg-accent-dim border border-accent/30 p-6 flex items-center justify-center gap-3">
               <WalletIcon size={28} className="text-accent" />
               <CreditCard size={28} className="text-accent" />
             </div>
-          </div>
+          </TiltCard>
+          </FadeIn>
         </div>
 
+        <FadeIn delay={100}>
         <div className="rounded-2xl border border-border bg-surface p-5 md:p-6">
           <h2 className="font-medium text-sm mb-4">Recent requests</h2>
           <div className="overflow-x-auto -mx-5 md:mx-0 px-5 md:px-0">
@@ -248,7 +259,7 @@ export default function RequestReportPage() {
                   </tr>
                 )}
                 {recent.map((r) => (
-                  <tr key={`${r.requestId}-${r.createdAt}`}>
+                  <tr key={`${r.requestId}-${r.createdAt}`} className="hover:bg-surface-2 transition-colors">
                     <td className="py-2.5 font-mono text-xs">{shortHash(r.txHash)}</td>
                     <td className="py-2.5 font-mono text-xs">{shortAddr(r.walletAnalyzed)}</td>
                     <td className="py-2.5">
@@ -263,6 +274,7 @@ export default function RequestReportPage() {
             </table>
           </div>
         </div>
+        </FadeIn>
       </main>
     </div>
   );

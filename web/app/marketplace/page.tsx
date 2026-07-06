@@ -3,6 +3,8 @@
 import { useEffect, useState } from "react";
 import { Search, Bot, Cpu, Users } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
+import { FadeIn } from "@/components/FadeIn";
+import { TiltCard } from "@/components/TiltCard";
 import { getStats, type Stats } from "@/lib/api";
 
 type Tab = "all" | "mine";
@@ -85,28 +87,31 @@ export default function MarketplacePage() {
             </div>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              {agents.map((a) => (
-                <div key={a.name} className="rounded-2xl border border-border bg-surface p-5 flex flex-col">
-                  <div className="flex items-start justify-between mb-3">
-                    <div className="w-10 h-10 rounded-lg bg-accent-dim border border-accent/30 flex items-center justify-center text-accent">
-                      <a.icon size={18} />
+              {agents.map((a, i) => (
+                <FadeIn key={a.name} delay={i * 80}>
+                  <TiltCard className="rounded-2xl border border-border bg-surface p-5 flex flex-col h-full hover:border-accent/40 transition-colors">
+                    <div className="flex items-start justify-between mb-3">
+                      <div className="w-10 h-10 rounded-lg bg-accent-dim border border-accent/30 flex items-center justify-center text-accent">
+                        <a.icon size={18} />
+                      </div>
+                      <span className={`text-xs flex items-center gap-1 ${a.online ? "text-accent" : "text-muted"}`}>
+                        <span className={`w-1.5 h-1.5 rounded-full inline-block ${a.online ? "bg-accent animate-pulse" : "bg-muted"}`} />
+                        {a.online ? "Online" : "Offline"}
+                      </span>
                     </div>
-                    <span className={`text-xs flex items-center gap-1 ${a.online ? "text-accent" : "text-muted"}`}>
-                      <span className={`w-1.5 h-1.5 rounded-full inline-block ${a.online ? "bg-accent" : "bg-muted"}`} />
-                      {a.online ? "Online" : "Offline"}
-                    </span>
-                  </div>
-                  <h2 className="font-medium text-sm">{a.name}</h2>
-                  <p className="text-xs text-accent mb-2">{a.role}</p>
-                  <p className="text-xs text-muted flex-1">{a.desc}</p>
-                  <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
-                    <span className="text-xs text-muted">{a.stat}</span>
-                  </div>
-                </div>
+                    <h2 className="font-medium text-sm">{a.name}</h2>
+                    <p className="text-xs text-accent mb-2">{a.role}</p>
+                    <p className="text-xs text-muted flex-1">{a.desc}</p>
+                    <div className="mt-3 pt-3 border-t border-border flex items-center justify-between">
+                      <span className="text-xs text-muted">{a.stat}</span>
+                    </div>
+                  </TiltCard>
+                </FadeIn>
               ))}
             </div>
           </>
         ) : (
+          <FadeIn>
           <div className="rounded-2xl border border-border bg-surface p-8 text-center">
             <Users size={28} className="text-muted mx-auto mb-3" />
             <p className="text-sm text-muted">
@@ -114,6 +119,7 @@ export default function MarketplacePage() {
               Telegram bot token, and point it at the ReportPayments contract. See the Docs for how.
             </p>
           </div>
+          </FadeIn>
         )}
       </main>
     </div>

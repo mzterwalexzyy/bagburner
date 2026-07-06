@@ -1,5 +1,6 @@
 import { ShieldCheck, Link2, Bot } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
+import { FadeIn } from "@/components/FadeIn";
 
 const NAV_SECTIONS = [
   { title: "Getting Started", items: ["Introduction", "Quick Start Guide", "Connect Wallet", "Request Your First Report"] },
@@ -39,6 +40,7 @@ export default function DocsPage() {
           </nav>
 
           <div className="lg:col-span-3 space-y-6">
+            <FadeIn>
             <section className="rounded-2xl border border-border bg-surface p-5 md:p-8">
               <h2 className="text-lg font-semibold mb-2">Introduction</h2>
               <p className="text-sm text-muted mb-6">
@@ -52,14 +54,16 @@ export default function DocsPage() {
                   [ShieldCheck, "On-Chain Verified", "Payments and requests are verified on BOT Chain testnet — the host never trusts a client-supplied claim."],
                   [Bot, "Autonomous Agents", "AI agents handle negotiation, payment, analysis, and delivery — no human in the loop."],
                   [Link2, "Real Data", "Real Ethereum transaction history and pricing, not simulated numbers."],
-                ].map(([Icon, title, desc]) => {
+                ].map(([Icon, title, desc], i) => {
                   const IconComp = Icon as typeof ShieldCheck;
                   return (
-                    <div key={title as string} className="rounded-xl bg-surface-2 border border-border p-4">
-                      <IconComp size={18} className="text-accent mb-2" />
-                      <div className="text-sm font-medium mb-1">{title as string}</div>
-                      <div className="text-xs text-muted">{desc as string}</div>
-                    </div>
+                    <FadeIn key={title as string} delay={i * 80}>
+                      <div className="rounded-xl bg-surface-2 border border-border p-4 hover:border-accent/40 transition-colors">
+                        <IconComp size={18} className="text-accent mb-2" />
+                        <div className="text-sm font-medium mb-1">{title as string}</div>
+                        <div className="text-xs text-muted">{desc as string}</div>
+                      </div>
+                    </FadeIn>
                   );
                 })}
               </div>
@@ -71,14 +75,14 @@ export default function DocsPage() {
                   ["2", "Pay", "Payment is made on-chain to the ReportPayments contract."],
                   ["3", "Analyze", "Host verifies payment and generates the report."],
                   ["4", "Deliver", "Report delivered as a PDF to the requesting agent."],
-                ].map(([n, title, desc]) => (
-                  <div key={title} className="text-center">
-                    <div className="w-8 h-8 rounded-full bg-accent-dim border border-accent/30 text-accent flex items-center justify-center mx-auto mb-2 text-xs font-semibold">
+                ].map(([n, title, desc], i) => (
+                  <FadeIn key={title} delay={i * 80} className="text-center group">
+                    <div className="w-8 h-8 rounded-full bg-accent-dim border border-accent/30 text-accent flex items-center justify-center mx-auto mb-2 text-xs font-semibold group-hover:scale-110 transition-transform">
                       {n}
                     </div>
                     <div className="text-xs font-medium mb-1">{title}</div>
                     <div className="text-xs text-muted">{desc}</div>
-                  </div>
+                  </FadeIn>
                 ))}
               </div>
 
@@ -91,6 +95,7 @@ export default function DocsPage() {
                 Learn more on GitHub →
               </a>
             </section>
+            </FadeIn>
           </div>
         </div>
       </main>
