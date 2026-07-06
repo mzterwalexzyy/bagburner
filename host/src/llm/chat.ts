@@ -6,7 +6,7 @@ import "dotenv/config";
  * LLM call fails or is rate-limited — the raw instructional `situation` text is never
  * posted verbatim, since it reads as a stage direction rather than dialogue.
  */
-export async function composeMessage(systemPrompt: string, situation: string, fallback: string): Promise<string> {
+export async function composeMessage(systemPrompt: string, situation: string, fallback: string, temperature?: number): Promise<string> {
   const baseUrl = process.env.LLM_BASE_URL ?? "https://api.openai.com/v1";
   const apiKey = process.env.LLM_API_KEY;
   const model = process.env.LLM_MODEL ?? "gpt-4o-mini";
@@ -22,6 +22,7 @@ export async function composeMessage(systemPrompt: string, situation: string, fa
           { role: "user", content: situation },
         ],
         max_tokens: 120,
+        ...(temperature !== undefined ? { temperature } : {}),
       }),
     });
     const json = await res.json();

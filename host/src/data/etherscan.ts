@@ -86,6 +86,20 @@ export async function fetchTradesForWallet(address: string): Promise<Trade[]> {
     ethLegByHash.set(t.hash, (ethLegByHash.get(t.hash) ?? 0) + amount);
   }
 
+  // Spam/airdrop tokens routinely batch dozens of fake Transfer events into one hash.
+  // If a hash also happens to carry a real ETH leg (e.g. an unrelated transfer in the
+  // same tx), naively giving every token in that hash the full ETH amount as its price
+  // would fabricate massive phantom proceeds against a $0 cost basis. Only trust the ETH
+  // leg as a price signal when the hash has exactly one distinct non-WETH token — a clean,
+  // unambiguous swap. Anything busier is noise, not a price.
+  const distinctTokensByHash = new Map<string, Set<string>>();
+  for (const t of tokenTxs) {
+    if (t.contractAddress.toLowerCase() === WETH_ADDRESS) continue;
+    const set = distinctTokensByHash.get(t.hash) ?? new Set<string>();
+    set.add(t.contractAddress.toLowerCase());
+    distinctTokensByHash.set(t.hash, set);
+  }
+
   const trades: Trade[] = [];
   for (const t of tokenTxs) {
     if (t.contractAddress.toLowerCase() === WETH_ADDRESS) continue; // WETH is the pricing leg, not a tracked asset
@@ -94,6 +108,7 @@ export async function fetchTradesForWallet(address: string): Promise<Trade[]> {
     if (tokenAmount <= 0) continue;
 
     const side: "buy" | "sell" = t.to.toLowerCase() === lower ? "buy" : "sell";
+    const isUnambiguousSwap = (distinctTokensByHash.get(t.hash)?.size ?? 0) === 1;
     trades.push({
       txHash: t.hash,
       timestamp: Number(t.timeStamp),
@@ -101,7 +116,7 @@ export async function fetchTradesForWallet(address: string): Promise<Trade[]> {
       tokenSymbol: t.tokenSymbol || "UNKNOWN",
       side,
       tokenAmount,
-      ethAmount: ethLegByHash.get(t.hash) ?? 0,
+      ethAmount: isUnambiguousSwap ? ethLegByHash.get(t.hash) ?? 0 : 0,
     });
   }
 
