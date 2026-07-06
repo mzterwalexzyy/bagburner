@@ -66,20 +66,17 @@ export default function HomePage() {
       <Topbar title="Dashboard" />
 
       <main className="p-8 max-w-7xl mx-auto space-y-8">
-        <section className="relative rounded-2xl overflow-hidden border border-border">
-          <Image
-            src="/hero-banner.png"
-            alt="BagBurner AI agent analyzing on-chain tax data"
-            width={1775}
-            height={953}
-            className="w-full h-auto object-cover"
-            priority
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-background via-transparent to-transparent opacity-60" />
-        </section>
-
         <section className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="lg:col-span-2 rounded-2xl border border-border bg-surface p-8">
+          <div className="relative lg:col-span-2 rounded-2xl border border-border overflow-hidden p-8">
+            <Image
+              src="/hero-banner.png"
+              alt=""
+              fill
+              priority
+              className="object-cover object-right -z-10"
+            />
+            <div className="absolute inset-0 bg-gradient-to-r from-background via-background/85 to-background/40 -z-10" />
+
             <span className="inline-block px-3 py-1 rounded-full bg-surface-2 border border-border text-xs text-muted mb-4">
               Autonomous. On-chain. Intelligent.
             </span>
