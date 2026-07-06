@@ -48,15 +48,21 @@ async function updateVercel(url) {
 
   for (let attempt = 1; attempt <= 3; attempt++) {
     console.log(`[watcher] attempt ${attempt}: setting env var...`);
-    // --value/--force/--yes make this fully non-interactive (no stdin-piping needed,
-    // which previously left a "store as sensitive?" prompt unanswered and silently
-    // dropped the variable).
+    // --value/--force/--yes/--non-interactive together are needed to fully avoid any
+    // prompt (the CLI's auto-detected non-interactive mode doesn't reliably cover every
+    // prompt on a TTY-less pm2 child — a bare --force/--yes run previously hung forever
+    // on the "store as sensitive?" prompt). A hard timeout is a second line of defense:
+    // if it ever hangs again, this throws instead of blocking the whole watcher forever.
     execSync(
-      `vercel env add NEXT_PUBLIC_HOST_URL production --value "${url}" --force --yes --token=${TOKEN}`,
-      { cwd: WEB_DIR, stdio: "inherit" }
+      `vercel env add NEXT_PUBLIC_HOST_URL production --value "${url}" --force --yes --non-interactive --token=${TOKEN}`,
+      { cwd: WEB_DIR, stdio: "inherit", timeout: 60_000 }
     );
     console.log(`[watcher] attempt ${attempt}: redeploying...`);
-    execSync(`vercel redeploy ${PRODUCTION_ALIAS} --token=${TOKEN} --non-interactive`, { cwd: WEB_DIR, stdio: "inherit" });
+    execSync(`vercel redeploy ${PRODUCTION_ALIAS} --token=${TOKEN} --non-interactive`, {
+      cwd: WEB_DIR,
+      stdio: "inherit",
+      timeout: 120_000,
+    });
 
     console.log(`[watcher] attempt ${attempt}: verifying live bundle contains the new URL...`);
     await sleep(5000); // let Vercel's edge cache/alias fully settle
