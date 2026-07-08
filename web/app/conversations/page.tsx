@@ -29,7 +29,7 @@ export default function ConversationsPage() {
   useEffect(() => {
     const load = () => getFeed(30).then(setFeed).catch(() => {});
     load();
-    const interval = setInterval(load, 5000);
+    const interval = setInterval(load, 10000);
     return () => clearInterval(interval);
   }, []);
 

@@ -63,7 +63,7 @@ The same underlying pipeline (steps 4–6) is reused verbatim when you message t
 
 ## Wallet pool
 
-Rather than calling a live wallet-discovery API during the demo (a point of failure on demo day), `scripts/fetch-wallet-pool.ts` builds `data/wallet-pool.json` once ahead of time: it pulls real recent callers of well-known Uniswap router contracts. Every address in the pool is a real, currently-active Ethereum wallet.
+Rather than calling a live wallet-discovery API during the demo (a point of failure on demo day), `scripts/fetch-wallet-pool.ts` builds `data/wallet-pool.json` once ahead of time: it pulls real recent callers of well-known Ethereum DEX/aggregator router contracts — Uniswap V2/V3/Universal Router, 1inch, 0x, and CoW Protocol — and verifies each one has real on-chain transfer history before including it. Every address in the pool is a real, currently-active Ethereum wallet; the pool currently holds 1,000 of them. (Platforms like Hyperliquid, Bluefin, and most perps venues live on their own chains with no Ethereum mainnet history to analyze — DEX aggregator callers are the closest real, verifiable proxy for active on-chain traders available to an Ethereum-mainnet-only tool.)
 
 ## MVP scope
 

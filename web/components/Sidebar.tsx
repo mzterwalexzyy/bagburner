@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, FileText, Files, MessagesSquare, Store, BookOpen, Info, Flame, ExternalLink, X } from "lucide-react";
+import { Home, FileText, Files, MessagesSquare, Store, BookOpen, Info, Flame, ExternalLink, X, Send } from "lucide-react";
 import { CONTRACT_ADDRESS } from "@/lib/contract";
 import { botChain } from "@/lib/wagmi";
 import { ThemeToggle } from "./ThemeToggle";
@@ -37,13 +37,13 @@ export function Sidebar({ open, onClose }: SidebarProps) {
       >
         <div>
           <div className="px-5 py-5 flex items-center justify-between border-b border-border">
-            <div className="flex items-center gap-2">
+            <Link href="/" onClick={onClose} className="flex items-center gap-2">
               <Flame size={22} className="text-accent" fill="currentColor" />
               <div>
                 <div className="font-semibold leading-tight">BagBurner</div>
                 <div className="text-xs text-accent leading-tight">AI Agent Tax Analyst</div>
               </div>
-            </div>
+            </Link>
             <button onClick={onClose} className="md:hidden text-muted p-1" aria-label="Close menu">
               <X size={20} />
             </button>
@@ -99,6 +99,15 @@ export function Sidebar({ open, onClose }: SidebarProps) {
               </a>
             )}
           </div>
+          <a
+            href="https://t.me/Bagburner_bot"
+            target="_blank"
+            rel="noreferrer"
+            className="flex items-center justify-center gap-2 rounded-lg border border-border bg-surface-2 hover:border-accent/40 hover:bg-accent-dim transition text-xs font-medium px-3 py-2"
+          >
+            <Send size={13} className="text-accent" />
+            Chat with Host on Telegram
+          </a>
         </div>
       </aside>
     </>

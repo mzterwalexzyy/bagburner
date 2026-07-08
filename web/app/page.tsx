@@ -55,7 +55,7 @@ export default function HomePage() {
       }
     };
     load();
-    const interval = setInterval(load, 5000);
+    const interval = setInterval(load, 10000);
     return () => {
       cancelled = true;
       clearInterval(interval);
