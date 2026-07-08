@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Link2, MessageSquare, FileText, Download } from "lucide-react";
+import { Link2, MessageSquare, FileText } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
 import { FadeIn } from "@/components/FadeIn";
 import { TiltCard } from "@/components/TiltCard";
@@ -35,11 +35,11 @@ export default function AboutPage() {
           <h2 className="text-lg font-semibold mb-3">Our Mission</h2>
           <p className="text-sm text-muted mb-2">
             To make crypto tax analysis accessible and autonomous through AI agents that transact with each other on
-            real, verifiable on-chain payments — no shared database, no trusted intermediary, no fake demos.
+            real, verifiable on-chain payments: no shared database, no trusted intermediary, no fake demos.
           </p>
           <p className="text-sm text-muted">
             Built for the BOT Chain Builder Challenge (AI Agent track). A host agent sells on-demand crypto tax
-            analysis, and autonomous guest agents keep paying it to analyze wallets — every payment is verified
+            analysis, and autonomous guest agents keep paying it to analyze wallets. Every payment is verified
             on-chain before any analysis runs.
           </p>
 
@@ -60,7 +60,7 @@ export default function AboutPage() {
 
           <p className="text-xs text-muted border-t border-border pt-4">
             This is a mathematical analysis tool, not tax advice. Consult a qualified tax professional for your
-            jurisdiction — rules vary significantly by country.
+            jurisdiction, as rules vary significantly by country.
           </p>
         </TiltCard>
         </FadeIn>
@@ -84,22 +84,6 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
-        </FadeIn>
-
-        <FadeIn delay={160}>
-        <a
-          href="/bagburner-demo-script.pdf"
-          download
-          className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-5 md:p-6 hover:border-accent/40 transition-colors"
-        >
-          <div className="w-9 h-9 rounded-lg bg-accent-dim border border-accent/30 flex items-center justify-center text-accent shrink-0">
-            <Download size={16} />
-          </div>
-          <div>
-            <div className="text-sm font-medium">Download Demo Video Script (PDF)</div>
-            <div className="text-xs text-muted">The script behind our submission demo video — problem, solution, and why BOT Chain.</div>
-          </div>
-        </a>
         </FadeIn>
       </main>
     </div>

@@ -3,7 +3,7 @@ import "dotenv/config";
 /**
  * Composes one natural-language chat line for an agent from a role prompt + situation
  * description. `fallback` (a plain, already-natural first-person sentence) is used if the
- * LLM call fails or is rate-limited — the raw instructional `situation` text is never
+ * LLM call fails or is rate-limited. The raw instructional `situation` text is never
  * posted verbatim, since it reads as a stage direction rather than dialogue.
  */
 export async function composeMessage(systemPrompt: string, situation: string, fallback: string, temperature?: number): Promise<string> {
@@ -34,4 +34,4 @@ export async function composeMessage(systemPrompt: string, situation: string, fa
 }
 
 export const HOST_ROLE_PROMPT =
-  "You are BagBurner Host, an autonomous AI agent that sells on-demand crypto tax analysis reports to other AI agents for a small on-chain fee. You are professional, efficient, and a little dry-witted. Reply with ONLY the one or two sentence chat message you want to send next — no markdown, no preamble, no quotes.";
+  "You are BagBurner Host, an autonomous AI agent that sells on-demand crypto tax analysis reports to other AI agents for a small on-chain fee. You are professional, efficient, and a little dry-witted. Reply with ONLY the one or two sentence chat message you want to send next. No markdown, no preamble, no quotes, and never use an em dash (—); use a comma, period, or colon instead.";

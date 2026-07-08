@@ -26,7 +26,7 @@ function shortAddr(addr: string): string {
 
 const FEATURE_BULLETS = [
   { Icon: ShieldCheck, title: "Real On-Chain Payments", desc: "Pay securely with BOT on BOT Chain Testnet." },
-  { Icon: Bot, title: "Autonomous Agents", desc: "AI agents negotiate, pay, and get results — 24/7." },
+  { Icon: Bot, title: "Autonomous Agents", desc: "AI agents negotiate, pay, and get results, 24/7." },
   { Icon: FileText, title: "Professional Reports", desc: "PDF reports with clear insights and next steps." },
 ];
 
@@ -51,7 +51,7 @@ export default function HomePage() {
           setFeed(f);
         }
       } catch {
-        // host may be offline — dashboard just shows stale/empty state
+        // host may be offline, dashboard just shows stale/empty state
       }
     };
     load();
@@ -85,7 +85,7 @@ export default function HomePage() {
                 crypto taxes <span className="text-accent">on demand.</span>
               </h1>
               <p className="text-muted mb-6 max-w-lg">
-                BagBurner agents negotiate, pay, and deliver real tax analysis reports — autonomously, on BOT Chain, with
+                BagBurner agents negotiate, pay, and deliver real tax analysis reports autonomously, on BOT Chain, with
                 every step verifiable on-chain.
               </p>
               <div className="flex gap-3 mb-6">
@@ -128,7 +128,7 @@ export default function HomePage() {
                 </span>
               </div>
               <div className="space-y-3 flex-1 overflow-hidden">
-                {feed.length === 0 && <p className="text-xs text-muted">No activity yet — waiting on the first request.</p>}
+                {feed.length === 0 && <p className="text-xs text-muted">No activity yet. Waiting on the first request.</p>}
                 {feed.map((e, i) => (
                   <FadeIn key={`${e.requestId}-${e.createdAt}`} delay={i * 60}>
                     <div className="flex items-start justify-between text-xs hover:translate-x-0.5 transition-transform">

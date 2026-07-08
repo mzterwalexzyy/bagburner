@@ -7,7 +7,7 @@ import { summarize } from "../llm/summarize.js";
 import { generateQuip } from "../llm/quip.js";
 import type { TaxReport } from "../types.js";
 
-/** Runs the full off-chain analysis pipeline for a wallet — shared by the guest HTTP flow and the direct human-chat flow. */
+/** Runs the full off-chain analysis pipeline for a wallet, shared by the guest HTTP flow and the direct human-chat flow. */
 export async function buildTaxReport(walletAnalyzed: string, requestId: string, taxRatePercent?: number): Promise<TaxReport> {
   const trades = await fetchTradesForWallet(walletAnalyzed);
 
@@ -27,7 +27,7 @@ export async function buildTaxReport(walletAnalyzed: string, requestId: string, 
 
   const llmSummary = await summarize({ walletAnalyzed, realizedPnlUsd, unrealizedPnlUsd, harvestOpportunities });
 
-  // Tax is only owed on net positive realized gains — a net loss owes nothing, it doesn't go negative.
+  // Tax is only owed on net positive realized gains; a net loss owes nothing, it doesn't go negative.
   const potentialTaxOwedUsd = taxRatePercent !== undefined ? Math.max(realizedPnlUsd, 0) * (taxRatePercent / 100) : undefined;
 
   const quip = await generateQuip({ realizedPnlUsd, unrealizedPnlUsd, taxRatePercent, potentialTaxOwedUsd });

@@ -19,7 +19,7 @@ export interface FulfillParams {
   taxRatePercent?: number;
 }
 
-/** Shared "actually do the work" step used by every entry point (guest HTTP, Telegram human chat, web) — builds the report, saves the PDF to disk once, and logs the activity. */
+/** Shared "actually do the work" step used by every entry point (guest HTTP, Telegram human chat, web): builds the report, saves the PDF to disk once, and logs the activity. */
 export async function fulfillReport(params: FulfillParams): Promise<{ report: TaxReport; pdf: Buffer; pdfPath: string }> {
   const report = await buildTaxReport(params.walletAnalyzed, params.requestId, params.taxRatePercent);
   const pdf = await generateReportPdf(report);

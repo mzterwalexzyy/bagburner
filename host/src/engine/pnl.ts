@@ -4,7 +4,7 @@ interface PositionState {
   quantity: number;
   totalCostUsd: number;
   /** Portion of `quantity` that arrived with no priced acquisition leg (plain inbound
-   * transfer, airdrop, spam token) — cost-unknown, not cost-zero. Kept separate so a later
+   * transfer, airdrop, spam token), cost-unknown, not cost-zero. Kept separate so a later
    * sale of it can't manufacture a confident realized gain (or, symmetrically, a sale with
    * no priced leg on real holdings can't manufacture a confident realized loss). */
   unknownCostQuantity: number;
@@ -23,7 +23,7 @@ export interface PnlResult {
   openPositions: RawPosition[];
 }
 
-/** Average-cost-basis P&L engine (not FIFO — simpler, documented MVP tradeoff). */
+/** Average-cost-basis P&L engine (not FIFO; simpler, documented MVP tradeoff). */
 export function computePnl(trades: Trade[], ethUsdAt: (unixSeconds: number) => number): PnlResult {
   const positions = new Map<string, PositionState>();
   let realizedPnlUsd = 0;
@@ -38,7 +38,7 @@ export function computePnl(trades: Trade[], ethUsdAt: (unixSeconds: number) => n
       if (usdValue > 0) {
         pos.totalCostUsd += usdValue;
       } else {
-        // Plain inbound transfer / airdrop / spam token with no priced leg — this is not
+        // Plain inbound transfer / airdrop / spam token with no priced leg: this is not
         // a $0 purchase, it's an unknown cost basis. Tracking it separately stops a later
         // sale from being scored as pure invented profit.
         pos.unknownCostQuantity += trade.tokenAmount;
@@ -50,7 +50,7 @@ export function computePnl(trades: Trade[], ethUsdAt: (unixSeconds: number) => n
         // Only recognize realized P&L for the fraction of this sale backed by a known cost
         // basis AND a priced sale leg. A sale with no priced leg (plain outbound transfer,
         // not a market sale) or a sale of cost-unknown inventory is removed from the position
-        // without asserting a gain or loss — we simply don't have reliable numbers for it.
+        // without asserting a gain or loss, since we simply don't have reliable numbers for it.
         if (usdValue > 0 && knownQty > 0) {
           const knownFraction = Math.min(1, knownQty / pos.quantity);
           const knownSellQty = sellQty * knownFraction;

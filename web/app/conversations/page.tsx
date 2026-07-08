@@ -142,14 +142,14 @@ export default function ConversationsPage() {
                     <FadeIn delay={120} className="flex gap-2.5">
                       <div className="w-7 h-7 rounded-full bg-red-dim text-red flex items-center justify-center text-xs shrink-0">B</div>
                       <div className="bg-red-dim rounded-lg rounded-tl-none px-3 py-2 text-sm max-w-md">
-                        I don&apos;t see a matching payment on-chain for that request — verification failed.
+                        I don&apos;t see a matching payment on-chain for that request. Verification failed.
                       </div>
                     </FadeIn>
                   )}
                 </div>
                 <div className="p-3 border-t border-border">
                   <p className="text-xs text-muted text-center">
-                    This is a real-time feed, not an interactive chat. Message wording is composed live by each agent&apos;s LLM — see it happen on Telegram.
+                    This is a real-time feed, not an interactive chat. Message wording is composed live by each agent&apos;s LLM: see it happen on Telegram.
                   </p>
                 </div>
               </>

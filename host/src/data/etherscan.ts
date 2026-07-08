@@ -27,7 +27,7 @@ function sleep(ms: number) {
 
 // Etherscan's API is occasionally flaky/inconsistent between requests for the same
 // address (has been observed returning "No transactions found" then real data moments
-// later) — retry a couple of times before trusting an empty result.
+// later), so retry a couple of times before trusting an empty result.
 async function etherscanCall(params: Record<string, string>, attempt = 1): Promise<any[]> {
   const apiKey = process.env.ETHERSCAN_API_KEY;
   if (!apiKey) throw new Error("ETHERSCAN_API_KEY is not set");
@@ -51,7 +51,7 @@ async function etherscanCall(params: Record<string, string>, attempt = 1): Promi
       await sleep(800 * attempt);
       return etherscanCall(params, attempt + 1);
     }
-    throw new Error(`Etherscan error: ${json.message} — ${JSON.stringify(json.result).slice(0, 200)}`);
+    throw new Error(`Etherscan error: ${json.message}: ${JSON.stringify(json.result).slice(0, 200)}`);
   }
   return json.result;
 }
@@ -66,7 +66,7 @@ function fetchTokenTxs(address: string): Promise<EtherscanTokenTx[]> {
 
 /**
  * Builds a simplified trade list assuming ETH- or WETH-denominated DEX swaps.
- * Any tx that also moved native ETH or WETH is treated as that tx's "price leg" —
+ * Any tx that also moved native ETH or WETH is treated as that tx's "price leg";
  * token-to-token swaps with no ETH/WETH leg on the same hash won't get a cost basis.
  * This is an MVP simplification, not general-purpose cost-basis tracking.
  */
@@ -90,7 +90,7 @@ export async function fetchTradesForWallet(address: string): Promise<Trade[]> {
   // If a hash also happens to carry a real ETH leg (e.g. an unrelated transfer in the
   // same tx), naively giving every token in that hash the full ETH amount as its price
   // would fabricate massive phantom proceeds against a $0 cost basis. Only trust the ETH
-  // leg as a price signal when the hash has exactly one distinct non-WETH token — a clean,
+  // leg as a price signal when the hash has exactly one distinct non-WETH token, a clean,
   // unambiguous swap. Anything busier is noise, not a price.
   const distinctTokensByHash = new Map<string, Set<string>>();
   for (const t of tokenTxs) {

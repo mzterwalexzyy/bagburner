@@ -1,18 +1,18 @@
 /**
- * Builds data/wallet-pool.json from real, currently-active Ethereum wallets —
+ * Builds data/wallet-pool.json from real, currently-active Ethereum wallets,
  * without needing Dune API access. Approach: pull recent senders to well-known
  * DEX/aggregator router contracts via Etherscan's free txlist endpoint, dedupe, and
  * filter out known contract addresses. Run once ahead of time (not during the live demo).
  *
  * Note: the host only analyzes Ethereum mainnet history (Etherscan-backed). Platforms
  * like Hyperliquid, Bluefin, and most perps venues live on their own chains/L2s with no
- * mainnet trade history to fetch — so "active trader" wallets here are sourced from
+ * mainnet trade history to fetch, so "active trader" wallets here are sourced from
  * mainnet DEX aggregators (1inch, 0x, CoW) and Uniswap, which are the closest real,
  * verifiable proxy for sophisticated/high-volume on-chain traders available to this tool.
  *
  * Usage:
- *   tsx scripts/fetch-wallet-pool.ts            — top up the existing pool to TARGET_POOL_SIZE
- *   tsx scripts/fetch-wallet-pool.ts --fresh     — discard the existing pool, source an entirely new batch
+ *   tsx scripts/fetch-wallet-pool.ts            : top up the existing pool to TARGET_POOL_SIZE
+ *   tsx scripts/fetch-wallet-pool.ts --fresh     : discard the existing pool, source an entirely new batch
  * Requires ETHERSCAN_API_KEY in host/.env or the environment.
  *
  * See scripts/pool-refill-watcher.mjs for the long-running process that calls this
@@ -28,7 +28,7 @@ const OUT_PATH = resolve(__dir, "../data/wallet-pool.json");
 const TARGET_POOL_SIZE = 1000;
 const PAGES_PER_CONTRACT = 4; // 4 * 300 = up to 1200 raw txs per contract
 
-// Well-known DEX/aggregator router contracts — their recent callers are real, active trader EOAs.
+// Well-known DEX/aggregator router contracts: their recent callers are real, active trader EOAs.
 const SOURCE_CONTRACTS = [
   "0x7a250d5630B4cF539739dF2C5dAcb4c659F2488D", // Uniswap V2 Router 02
   "0x68b3465833fb72A70ecDF485E0e4C7bD8665Fc45", // Uniswap V3 Router 2

@@ -44,7 +44,7 @@ async function runCycle(cycler: WalletCycler) {
   const askMsg = await composeMessage(
     rolePrompt,
     `Announce that you need a fresh tax report for wallet ${wallet}, mention you're assuming a ${taxRatePercent}% tax rate for the estimate, and say you're about to check the host's current fee on-chain.`,
-    `🔎 ${name}: I need a tax report for wallet ${wallet} — let's assume a ${taxRatePercent}% tax rate. Checking your fee on-chain now.`
+    `🔎 ${name}: I need a tax report for wallet ${wallet}, let's assume a ${taxRatePercent}% tax rate. Checking your fee on-chain now.`
   );
   await sendGuestMessage(askMsg);
 
@@ -91,7 +91,7 @@ async function runCycle(cycler: WalletCycler) {
 
 async function main() {
   const partition = getPartition(GUEST_ID, GUEST_COUNT);
-  if (partition.length === 0) throw new Error(`guest ${GUEST_ID} has an empty wallet partition — check data/wallet-pool.json`);
+  if (partition.length === 0) throw new Error(`guest ${GUEST_ID} has an empty wallet partition, check data/wallet-pool.json`);
   const cycler = new WalletCycler(GUEST_ID, partition);
 
   console.log(`[guest-${GUEST_ID}] starting, address ${guestAddress()}, ${partition.length} wallet(s) in partition, looping every ${LOOP_INTERVAL_MS}ms`);

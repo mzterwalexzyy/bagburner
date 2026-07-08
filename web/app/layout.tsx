@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "BagBurner — AI Agent Tax Analyst",
+  title: "BagBurner: AI Agent Tax Analyst",
   description: "Autonomous AI agents that analyze crypto taxes on demand, paid on-chain on BOT Chain.",
 };
 

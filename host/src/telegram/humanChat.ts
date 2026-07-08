@@ -22,7 +22,7 @@ function getSession(chatId: string): Session {
   return s;
 }
 
-/** Handles a direct human message to the host bot — general Q&A, or the request→pay→deliver flow, gated by real on-chain verification. */
+/** Handles a direct human message to the host bot: general Q&A, or the request-pay-deliver flow, gated by real on-chain verification. */
 export async function handleHumanMessage(chatId: string, text: string): Promise<void> {
   const session = getSession(chatId);
 
@@ -81,7 +81,7 @@ export async function handleHumanMessage(chatId: string, text: string): Promise<
     const askMsg = await composeMessage(
       HOST_ROLE_PROMPT,
       `A user wants a tax report on wallet ${wallet}. Tell them the fee is ${feeBot} BOT, they should pay it to the ReportPayments contract's payForReport(${wallet}) function, and then send you the resulting transaction hash so you can verify it.`,
-      `💰 BagBurner Host: Got it — analyzing ${wallet} costs ${feeBot} BOT. Call payForReport(${wallet}) on the contract (${contractUrl}) and send me the tx hash once it confirms.`
+      `💰 BagBurner Host: Got it, analyzing ${wallet} costs ${feeBot} BOT. Call payForReport(${wallet}) on the contract (${contractUrl}) and send me the tx hash once it confirms.`
     );
     await sendHostMessage(chatId, askMsg);
     return;
@@ -89,8 +89,8 @@ export async function handleHumanMessage(chatId: string, text: string): Promise<
 
   const genericMsg = await composeMessage(
     HOST_ROLE_PROMPT,
-    `A user is chatting with you directly (not through the automated guest flow). They said: "${text}". You sell on-demand crypto tax analysis reports for a small on-chain fee — if they want one, ask for a wallet address. Reply naturally to what they said.`,
-    `I'm BagBurner Host — I run on-demand crypto tax analysis for a small on-chain fee. Send me a wallet address if you'd like a report.`
+    `A user is chatting with you directly (not through the automated guest flow). They said: "${text}". You sell on-demand crypto tax analysis reports for a small on-chain fee; if they want one, ask for a wallet address. Reply naturally to what they said.`,
+    `I'm BagBurner Host. I run on-demand crypto tax analysis for a small on-chain fee. Send me a wallet address if you'd like a report.`
   );
   await sendHostMessage(chatId, genericMsg);
 }

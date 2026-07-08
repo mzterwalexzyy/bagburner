@@ -32,7 +32,7 @@ async function pollOnce() {
 /** Long-polls Telegram for direct private messages to the host bot, so a human can chat with it alongside the automated guest flow. No-op if HOST_BOT_TOKEN isn't set. */
 export function startHumanChatPoller() {
   if (!BOT_TOKEN) {
-    console.log("[host-chat] HOST_BOT_TOKEN not set — direct human chat disabled");
+    console.log("[host-chat] HOST_BOT_TOKEN not set, direct human chat disabled");
     return;
   }
   console.log("[host-chat] polling for direct messages to the host bot...");

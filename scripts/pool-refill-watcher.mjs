@@ -1,7 +1,7 @@
 /**
  * Long-running watcher (run under pm2 alongside the guest agents) that keeps the shared
  * wallet pool from going stale. Each guest's WalletCycler persists a monotonically
- * increasing `cursor` in data/logs/cursor-<guestId>.json — one increment per report cycle,
+ * increasing `cursor` in data/logs/cursor-<guestId>.json, one increment per report cycle,
  * never reset, even though it wraps (via modulo) when picking the next wallet. Summed
  * across guests, that's exactly "how many total wallet-picks have happened since the pool
  * was last refreshed."
@@ -67,19 +67,19 @@ function poolSize() {
 }
 
 async function refill() {
-  console.log(`[pool-watcher] threshold hit — refilling pool (was ${poolSize()} wallet(s))...`);
+  console.log(`[pool-watcher] threshold hit, refilling pool (was ${poolSize()} wallet(s))...`);
   try {
     execSync("npx tsx scripts/fetch-wallet-pool.ts --fresh", {
       cwd: REPO_ROOT,
       stdio: "inherit",
-      timeout: 30 * 60_000, // this walks thousands of Etherscan calls — give it room
+      timeout: 30 * 60_000, // this walks thousands of Etherscan calls, give it room
     });
   } catch (err) {
     console.error("[pool-watcher] refill run failed:", err instanceof Error ? err.message : err);
-    return; // leave cursors alone — try again next check rather than resetting on a failed refill
+    return; // leave cursors alone, try again next check rather than resetting on a failed refill
   }
 
-  console.log(`[pool-watcher] refill complete — now ${poolSize()} wallet(s). Resetting cursors and restarting guests...`);
+  console.log(`[pool-watcher] refill complete, now ${poolSize()} wallet(s). Resetting cursors and restarting guests...`);
   for (let i = 0; i < GUEST_COUNT; i++) resetCursor(i);
 
   const guestNames = Array.from({ length: GUEST_COUNT }, (_, i) => `bagburner-guest-${i}`).join(" ");
@@ -87,14 +87,14 @@ async function refill() {
     execSync(`pm2 restart ${guestNames}`, { stdio: "inherit", timeout: 60_000 });
     console.log("[pool-watcher] guests restarted on the refreshed pool.");
   } catch (err) {
-    console.error("[pool-watcher] failed to restart guests — restart them manually:", err instanceof Error ? err.message : err);
+    console.error("[pool-watcher] failed to restart guests, restart them manually:", err instanceof Error ? err.message : err);
   }
 }
 
 async function loop() {
   const consumed = totalConsumed();
   const size = poolSize();
-  console.log(`[pool-watcher] checked — ${consumed} total wallet-pick(s) since last refill, threshold ${REFILL_THRESHOLD}, pool size ${size}`);
+  console.log(`[pool-watcher] checked: ${consumed} total wallet-pick(s) since last refill, threshold ${REFILL_THRESHOLD}, pool size ${size}`);
   if (consumed >= REFILL_THRESHOLD) {
     await refill();
   }
@@ -102,7 +102,7 @@ async function loop() {
 
 async function main() {
   console.log(
-    `[pool-watcher] starting — watching ${GUEST_COUNT} guest(s), refill at ${REFILL_THRESHOLD} total picks, checking every ${CHECK_INTERVAL_MS}ms`
+    `[pool-watcher] starting, watching ${GUEST_COUNT} guest(s), refill at ${REFILL_THRESHOLD} total picks, checking every ${CHECK_INTERVAL_MS}ms`
   );
   // eslint-disable-next-line no-constant-condition
   while (true) {

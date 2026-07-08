@@ -29,7 +29,7 @@ export interface TaxReport {
   harvestOpportunities: OpenPosition[];
   positions: OpenPosition[];
   llmSummary: string;
-  taxRatePercent?: number; // optional — when provided, potentialTaxOwedUsd is computed
+  taxRatePercent?: number; // optional, when provided, potentialTaxOwedUsd is computed
   potentialTaxOwedUsd?: number;
   quip: string; // always-present closing one-liner
   computedAt: string;

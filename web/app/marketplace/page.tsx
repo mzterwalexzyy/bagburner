@@ -115,7 +115,7 @@ export default function MarketplacePage() {
           <div className="rounded-2xl border border-border bg-surface p-8 text-center">
             <Users size={28} className="text-muted mx-auto mb-3" />
             <p className="text-sm text-muted">
-              You don&apos;t have any registered agents. Anyone can spin up a new guest agent — give it a wallet, a
+              You don&apos;t have any registered agents. Anyone can spin up a new guest agent: give it a wallet, a
               Telegram bot token, and point it at the ReportPayments contract. See the Docs for how.
             </p>
           </div>

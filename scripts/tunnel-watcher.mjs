@@ -2,11 +2,11 @@
  * Runs cloudflared's free quick tunnel, and whenever it (re)starts with a new
  * random *.trycloudflare.com URL, automatically updates the Vercel project's
  * NEXT_PUBLIC_HOST_URL env var and triggers a redeploy so the live dashboard
- * always points at the current tunnel — no manual intervention needed.
+ * always points at the current tunnel, no manual intervention needed.
  *
  * Expects:
- *   ~/.bagburner-secrets/vercel-token   — a Vercel Personal Access Token
- *   ~/bagburner/web/.vercel/project.json — links this to the Vercel project
+ *   ~/.bagburner-secrets/vercel-token: a Vercel Personal Access Token
+ *   ~/bagburner/web/.vercel/project.json: links this to the Vercel project
  *
  * Run under pm2 in place of a bare `cloudflared tunnel` process.
  */
@@ -31,7 +31,7 @@ async function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-/** Confirms the live site's JS actually contains this exact tunnel URL — deployments can lag or silently reuse stale env, so don't trust the CLI's exit code alone. */
+/** Confirms the live site's JS actually contains this exact tunnel URL, since deployments can lag or silently reuse stale env, so don't trust the CLI's exit code alone. */
 async function verifyDeployed(url) {
   const pageRes = await fetch(`https://${PRODUCTION_ALIAS}/`);
   const html = await pageRes.text();
@@ -44,13 +44,13 @@ async function verifyDeployed(url) {
 }
 
 async function updateVercel(url) {
-  console.log(`[watcher] tunnel URL changed to ${url} — updating Vercel...`);
+  console.log(`[watcher] tunnel URL changed to ${url}, updating Vercel...`);
 
   for (let attempt = 1; attempt <= 3; attempt++) {
     console.log(`[watcher] attempt ${attempt}: setting env var...`);
     // --value/--force/--yes/--non-interactive together are needed to fully avoid any
     // prompt (the CLI's auto-detected non-interactive mode doesn't reliably cover every
-    // prompt on a TTY-less pm2 child — a bare --force/--yes run previously hung forever
+    // prompt on a TTY-less pm2 child; a bare --force/--yes run previously hung forever
     // on the "store as sensitive?" prompt). A hard timeout is a second line of defense:
     // if it ever hangs again, this throws instead of blocking the whole watcher forever.
     execSync(
@@ -68,12 +68,12 @@ async function updateVercel(url) {
     await sleep(5000); // let Vercel's edge cache/alias fully settle
     if (await verifyDeployed(url)) {
       writeFileSync(STATE_FILE, url);
-      console.log(`[watcher] verified — ${STATE_FILE} now points at ${url}`);
+      console.log(`[watcher] verified: ${STATE_FILE} now points at ${url}`);
       return;
     }
     console.error(`[watcher] attempt ${attempt}: live bundle still doesn't contain ${url}, retrying...`);
   }
-  throw new Error(`gave up after 3 attempts — live site never picked up ${url}`);
+  throw new Error(`gave up after 3 attempts, live site never picked up ${url}`);
 }
 
 function startTunnel() {

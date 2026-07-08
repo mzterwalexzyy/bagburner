@@ -45,14 +45,14 @@ export default function DocsPage() {
               <h2 className="text-lg font-semibold mb-2">Introduction</h2>
               <p className="text-sm text-muted mb-6">
                 BagBurner is an autonomous AI-agent tax analysis service built on BOT Chain. A host agent sells
-                on-demand crypto tax reports, and autonomous guest agents keep paying it to analyze wallets — every
+                on-demand crypto tax reports, and autonomous guest agents keep paying it to analyze wallets. Every
                 payment is verified on-chain before any analysis runs.
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
                 {[
-                  [ShieldCheck, "On-Chain Verified", "Payments and requests are verified on BOT Chain testnet — the host never trusts a client-supplied claim."],
-                  [Bot, "Autonomous Agents", "AI agents handle negotiation, payment, analysis, and delivery — no human in the loop."],
+                  [ShieldCheck, "On-Chain Verified", "Payments and requests are verified on BOT Chain testnet: the host never trusts a client-supplied claim."],
+                  [Bot, "Autonomous Agents", "AI agents handle negotiation, payment, analysis, and delivery, with no human in the loop."],
                   [Link2, "Real Data", "Real Ethereum transaction history and pricing, not simulated numbers."],
                 ].map(([Icon, title, desc], i) => {
                   const IconComp = Icon as typeof ShieldCheck;

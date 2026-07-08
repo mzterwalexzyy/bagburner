@@ -18,7 +18,7 @@ const REPORT_PAYMENTS_ABI = [
 
 const CONTRACT_ADDRESS = (process.env.CONTRACT_ADDRESS ?? "").toLowerCase() as Address;
 
-// In-memory replay guard — a txHash can only be redeemed for a report once per host process lifetime.
+// In-memory replay guard: a txHash can only be redeemed for a report once per host process lifetime.
 const usedTxHashes = new Set<string>();
 
 export interface VerifiedPayment {
@@ -72,7 +72,7 @@ export async function verifyPaymentForWallet(txHash: `0x${string}`, expectedWall
   throw new Error("No matching ReportRequested event found in transaction for that wallet");
 }
 
-/** Call only once a report has actually been produced and returned — not right after verification. */
+/** Call only once a report has actually been produced and returned, not right after verification. */
 export function markRedeemed(txHash: `0x${string}`) {
   usedTxHashes.add(txHash.toLowerCase());
 }

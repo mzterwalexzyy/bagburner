@@ -20,7 +20,7 @@ app.use("/reports", express.static(resolve(__dir, "../reports")));
 
 const PORT = Number(process.env.PORT ?? 4000);
 
-// Guest agent flow — payer identity (guest) must match the on-chain event.
+// Guest agent flow: payer identity (guest) must match the on-chain event.
 app.post("/report", async (req, res) => {
   const body = req.body as Partial<ReportRequestBody>;
   const { guest, walletAnalyzed, txHash, chain, telegramChatId, taxRatePercent } = body;
@@ -34,7 +34,7 @@ app.post("/report", async (req, res) => {
 
   try {
     const payment = await verifyPayment(txHash as `0x${string}`, guest, walletAnalyzed);
-    console.log(`[host] payment verified — requestId ${payment.requestId}, fee ${payment.fee} wei`);
+    console.log(`[host] payment verified, requestId ${payment.requestId}, fee ${payment.fee} wei`);
     const verifiedMsg = await composeMessage(
       HOST_ROLE_PROMPT,
       `Payment just verified on-chain (tx ${txHash}) from a guest agent. Say you're starting the analysis on wallet ${walletAnalyzed}.`,
@@ -52,7 +52,7 @@ app.post("/report", async (req, res) => {
       taxRatePercent,
     });
     markRedeemed(txHash as `0x${string}`);
-    console.log(`[host] report ready for requestId ${payment.requestId} — realized $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}`);
+    console.log(`[host] report ready for requestId ${payment.requestId}: realized $${report.realizedPnlUsd.toFixed(2)}, unrealized $${report.unrealizedPnlUsd.toFixed(2)}`);
 
     const taxNote = report.potentialTaxOwedUsd !== undefined
       ? ` Assuming their ${report.taxRatePercent}% tax rate, estimated tax owed is $${report.potentialTaxOwedUsd.toFixed(2)}.`
@@ -73,7 +73,7 @@ app.post("/report", async (req, res) => {
   }
 });
 
-// Web dashboard flow — a browser-connected wallet pays directly; no pre-registered guest identity.
+// Web dashboard flow: a browser-connected wallet pays directly, no pre-registered guest identity.
 app.post("/request", async (req, res) => {
   const { walletAnalyzed, txHash, taxRatePercent } = req.body as {
     walletAnalyzed?: string;

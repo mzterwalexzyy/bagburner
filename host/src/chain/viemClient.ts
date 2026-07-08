@@ -1,7 +1,7 @@
 import "dotenv/config";
 import { createPublicClient, defineChain, http, parseAbi } from "viem";
 
-// BOT Chain is not a built-in viem chain — defined from env so testnet values
+// BOT Chain is not a built-in viem chain, so it's defined from env so testnet values
 // (chain ID / RPC / explorer) can be filled in once known, without code changes.
 const botChain = defineChain({
   id: Number(process.env.CHAIN_ID ?? "0"),

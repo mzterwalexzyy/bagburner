@@ -24,7 +24,7 @@ export async function getCurrentTokenPricesUsd(addresses: string[]): Promise<Map
       const price = json[address.toLowerCase()]?.usd;
       if (price) result.set(address.toLowerCase(), price);
     } catch {
-      // treated as "no listing" — verdict engine handles this as illiquid/dead
+      // treated as "no listing"; verdict engine handles this as illiquid/dead
     }
     await sleep(300);
   }
@@ -34,7 +34,7 @@ export async function getCurrentTokenPricesUsd(addresses: string[]): Promise<Map
 
 /**
  * ETH/USD price series for [fromUnix, toUnix], as [timestampMs, price] pairs sorted ascending.
- * CoinGecko's free tier only serves the past 365 days of history — older ranges return an
+ * CoinGecko's free tier only serves the past 365 days of history; older ranges return an
  * error, in which case this returns an empty series (caller should fall back to a flat price).
  */
 export async function getEthUsdPriceSeries(fromUnix: number, toUnix: number): Promise<Array<[number, number]>> {
@@ -63,8 +63,8 @@ export async function getCurrentEthPriceUsd(): Promise<number> {
 
 /**
  * Nearest known ETH/USD price at or before the given unix-seconds timestamp. Falls back to
- * `fallbackPrice` (current ETH price) when the series is empty — e.g. the trade predates
- * CoinGecko's free 365-day history window — so cost basis degrades to an approximation
+ * `fallbackPrice` (current ETH price) when the series is empty, e.g. the trade predates
+ * CoinGecko's free 365-day history window, so cost basis degrades to an approximation
  * instead of silently zeroing out.
  */
 export function nearestEthPrice(series: Array<[number, number]>, unixSeconds: number, fallbackPrice = 0): number {
