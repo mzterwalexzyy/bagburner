@@ -85,7 +85,7 @@ export function Sidebar({ open, onClose }: SidebarProps) {
             <div className="flex items-center justify-between">
               <span className="text-muted">Contract</span>
               <span className="font-mono">
-                {CONTRACT_ADDRESS ? `${CONTRACT_ADDRESS.slice(0, 6)}...${CONTRACT_ADDRESS.slice(-4)}` : "—"}
+                {CONTRACT_ADDRESS ? `${CONTRACT_ADDRESS.slice(0, 6)}...${CONTRACT_ADDRESS.slice(-4)}` : "N/A"}
               </span>
             </div>
             {explorerUrl && CONTRACT_ADDRESS && (

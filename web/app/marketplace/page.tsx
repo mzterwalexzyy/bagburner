@@ -31,7 +31,7 @@ export default function MarketplacePage() {
       role: "Tax Analysis Service",
       desc: "Always-on tax analysis and reporting service. Verifies payment on-chain before analyzing any wallet.",
       online,
-      stat: stats ? `${stats.reportsGenerated} reports · ${stats.successRate}% success` : "—",
+      stat: stats ? `${stats.reportsGenerated} reports · ${stats.successRate}% success` : "…",
     },
     {
       icon: Bot,

@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Link2, MessageSquare, FileText } from "lucide-react";
+import { Link2, MessageSquare, FileText, Download } from "lucide-react";
 import { Topbar } from "@/components/Topbar";
 import { FadeIn } from "@/components/FadeIn";
 import { TiltCard } from "@/components/TiltCard";
@@ -45,15 +45,15 @@ export default function AboutPage() {
 
           <div className="grid grid-cols-3 gap-4 my-6 text-center">
             <div>
-              <div className="text-2xl font-semibold text-accent">{stats ? <><CountUp value={stats.reportsGenerated} />+</> : "—"}</div>
+              <div className="text-2xl font-semibold text-accent">{stats ? <><CountUp value={stats.reportsGenerated} />+</> : "…"}</div>
               <div className="text-xs text-muted mt-1">Reports Generated</div>
             </div>
             <div>
-              <div className="text-2xl font-semibold text-accent">{stats ? <CountUp value={stats.activeAgents} /> : "—"}</div>
+              <div className="text-2xl font-semibold text-accent">{stats ? <CountUp value={stats.activeAgents} /> : "…"}</div>
               <div className="text-xs text-muted mt-1">Active Agents</div>
             </div>
             <div>
-              <div className="text-2xl font-semibold text-accent">{stats ? <><CountUp value={stats.successRate} />%</> : "—"}</div>
+              <div className="text-2xl font-semibold text-accent">{stats ? <><CountUp value={stats.successRate} />%</> : "…"}</div>
               <div className="text-xs text-muted mt-1">On-Chain Verified</div>
             </div>
           </div>
@@ -84,6 +84,22 @@ export default function AboutPage() {
             ))}
           </div>
         </div>
+        </FadeIn>
+
+        <FadeIn delay={160}>
+        <a
+          href="/bagburner-demo-script.pdf"
+          download
+          className="flex items-center gap-3 rounded-2xl border border-border bg-surface p-5 md:p-6 hover:border-accent/40 transition-colors"
+        >
+          <div className="w-9 h-9 rounded-lg bg-accent-dim border border-accent/30 flex items-center justify-center text-accent shrink-0">
+            <Download size={16} />
+          </div>
+          <div>
+            <div className="text-sm font-medium">Download Demo Video Script (PDF)</div>
+            <div className="text-xs text-muted">The script behind our submission demo video — problem, solution, and why BOT Chain.</div>
+          </div>
+        </a>
         </FadeIn>
       </main>
     </div>

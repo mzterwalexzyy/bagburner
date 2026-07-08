@@ -136,7 +136,7 @@ export default function MyReportsPage() {
                             )}
                           </>
                         ) : (
-                          <span className="text-muted">—</span>
+                          <span className="text-muted">N/A</span>
                         )}
                       </td>
                       <td className="p-4">

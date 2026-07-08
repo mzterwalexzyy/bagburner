@@ -153,14 +153,14 @@ export default function HomePage() {
             <StatCard
               icon={FileText}
               label="Reports Generated"
-              value={stats ? <CountUp value={stats.reportsGenerated} /> : "—"}
+              value={stats ? <CountUp value={stats.reportsGenerated} /> : "…"}
             />
           </FadeIn>
           <FadeIn delay={60}>
             <StatCard
               icon={Users}
               label="Active Guest Agents"
-              value={stats ? <CountUp value={stats.activeAgents} /> : "—"}
+              value={stats ? <CountUp value={stats.activeAgents} /> : "…"}
               sublabel="24/7 automated"
             />
           </FadeIn>
@@ -168,7 +168,7 @@ export default function HomePage() {
             <StatCard
               icon={Coins}
               label="Total Volume"
-              value={stats ? <CountUp value={stats.totalVolumeBot} format={(n) => `${n.toFixed(4)} BOT`} /> : "—"}
+              value={stats ? <CountUp value={stats.totalVolumeBot} format={(n) => `${n.toFixed(4)} BOT`} /> : "…"}
               sublabel="On-chain payments"
             />
           </FadeIn>
@@ -176,7 +176,7 @@ export default function HomePage() {
             <StatCard
               icon={CheckCircle2}
               label="Success Rate"
-              value={stats ? <CountUp value={stats.successRate} format={(n) => `${Math.round(n)}%`} /> : "—"}
+              value={stats ? <CountUp value={stats.successRate} format={(n) => `${Math.round(n)}%`} /> : "…"}
               sublabel="All time"
             />
           </FadeIn>

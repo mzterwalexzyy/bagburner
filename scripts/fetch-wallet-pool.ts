@@ -10,8 +10,14 @@
  * mainnet DEX aggregators (1inch, 0x, CoW) and Uniswap, which are the closest real,
  * verifiable proxy for sophisticated/high-volume on-chain traders available to this tool.
  *
- * Usage: tsx scripts/fetch-wallet-pool.ts
+ * Usage:
+ *   tsx scripts/fetch-wallet-pool.ts            — top up the existing pool to TARGET_POOL_SIZE
+ *   tsx scripts/fetch-wallet-pool.ts --fresh     — discard the existing pool, source an entirely new batch
  * Requires ETHERSCAN_API_KEY in host/.env or the environment.
+ *
+ * See scripts/pool-refill-watcher.mjs for the long-running process that calls this
+ * automatically (with --fresh) once the guest agents have collectively cycled through
+ * ~90% of the pool.
  */
 import { writeFileSync, readFileSync, existsSync } from "fs";
 import { resolve, dirname } from "path";
@@ -51,12 +57,37 @@ function sleep(ms: number) {
 
 // Etherscan's account-level index has been observed returning "No transactions found"
 // for addresses whose only activity is very recent (sync lag), then correcting itself
-// minutes later. Sourcing senders from an older block range (well-indexed by now)
-// avoids the flakiest, freshest wallets.
-const OLDER_START_BLOCK = "23000000";
-const OLDER_END_BLOCK = "23500000";
+// minutes later. Sourcing senders from a window that ends a bit behind the chain tip
+// (well-indexed by now) avoids the flakiest, freshest wallets. The window is computed
+// relative to the CURRENT tip (not a fixed constant) so that a later --fresh refill run
+// naturally slides forward and surfaces different candidates than the previous run,
+// instead of rediscovering the exact same top senders every time.
+const WINDOW_SIZE = 500_000;
+const WINDOW_LAG = 200_000; // stay this far behind the tip to dodge sync-lag flakiness
+const FALLBACK_START_BLOCK = "23000000";
+const FALLBACK_END_BLOCK = "23500000";
 
-async function fetchSendersPage(contractAddress: string, page: number): Promise<string[]> {
+async function fetchBlockWindow(): Promise<{ start: string; end: string }> {
+  const apiKey = process.env.ETHERSCAN_API_KEY;
+  try {
+    const url = new URL("https://api.etherscan.io/v2/api");
+    url.searchParams.set("chainid", "1");
+    url.searchParams.set("module", "proxy");
+    url.searchParams.set("action", "eth_blockNumber");
+    url.searchParams.set("apikey", apiKey ?? "");
+    const res = await fetch(url.toString());
+    const json = await res.json();
+    const tip = parseInt(json.result, 16);
+    if (!tip || Number.isNaN(tip)) throw new Error("bad block number response");
+    const end = tip - WINDOW_LAG;
+    const start = end - WINDOW_SIZE;
+    return { start: String(start), end: String(end) };
+  } catch {
+    return { start: FALLBACK_START_BLOCK, end: FALLBACK_END_BLOCK };
+  }
+}
+
+async function fetchSendersPage(contractAddress: string, page: number, window: { start: string; end: string }): Promise<string[]> {
   const apiKey = process.env.ETHERSCAN_API_KEY;
   if (!apiKey) throw new Error("ETHERSCAN_API_KEY not set");
 
@@ -65,8 +96,8 @@ async function fetchSendersPage(contractAddress: string, page: number): Promise<
   url.searchParams.set("module", "account");
   url.searchParams.set("action", "txlist");
   url.searchParams.set("address", contractAddress);
-  url.searchParams.set("startblock", OLDER_START_BLOCK);
-  url.searchParams.set("endblock", OLDER_END_BLOCK);
+  url.searchParams.set("startblock", window.start);
+  url.searchParams.set("endblock", window.end);
   url.searchParams.set("sort", "desc");
   url.searchParams.set("page", String(page));
   url.searchParams.set("offset", "300");
@@ -81,10 +112,10 @@ async function fetchSendersPage(contractAddress: string, page: number): Promise<
     .filter((addr: string) => !!addr && !KNOWN_CONTRACTS.has(addr.toLowerCase()));
 }
 
-async function fetchSenders(contractAddress: string): Promise<string[]> {
+async function fetchSenders(contractAddress: string, window: { start: string; end: string }): Promise<string[]> {
   const all: string[] = [];
   for (let page = 1; page <= PAGES_PER_CONTRACT; page++) {
-    const senders = await fetchSendersPage(contractAddress, page);
+    const senders = await fetchSendersPage(contractAddress, page, window);
     all.push(...senders);
     if (senders.length === 0) break; // ran out of pages for this contract
     await sleep(250);
@@ -123,15 +154,23 @@ function loadExistingPool(): string[] {
 }
 
 async function main() {
-  const existing = loadExistingPool().map((a) => a.toLowerCase());
+  const fresh = process.argv.includes("--fresh");
+  const existing = fresh ? [] : loadExistingPool().map((a) => a.toLowerCase());
   const verified: string[] = [...existing];
   const seen = new Set(existing);
-  console.log(`Starting from ${existing.length} already-verified wallet(s) in the existing pool.`);
+  console.log(
+    fresh
+      ? "Fresh mode — ignoring the existing pool, sourcing an entirely new batch."
+      : `Starting from ${existing.length} already-verified wallet(s) in the existing pool.`
+  );
+
+  const window = await fetchBlockWindow();
+  console.log(`Using block window ${window.start}-${window.end}`);
 
   const candidates = new Set<string>();
   for (const contract of SOURCE_CONTRACTS) {
     if (verified.length >= TARGET_POOL_SIZE) break;
-    const senders = await fetchSenders(contract);
+    const senders = await fetchSenders(contract, window);
     for (const s of senders) {
       const lower = s.toLowerCase();
       if (!seen.has(lower)) candidates.add(lower);
