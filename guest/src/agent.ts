@@ -12,7 +12,7 @@ const __dir = dirname(fileURLToPath(import.meta.url));
 const GUEST_ID = Number(process.env.GUEST_ID ?? "0");
 const GUEST_COUNT = Number(process.env.GUEST_COUNT ?? "1");
 const HOST_URL = process.env.HOST_URL ?? "http://localhost:4000";
-const LOOP_INTERVAL_MS = Number(process.env.LOOP_INTERVAL_MS ?? "60000");
+const LOOP_INTERVAL_MS = Number(process.env.LOOP_INTERVAL_MS ?? "86400000");
 
 const logsDir = resolve(__dir, "../../data/logs");
 const logPath = resolve(logsDir, `guest-${GUEST_ID}.jsonl`);
